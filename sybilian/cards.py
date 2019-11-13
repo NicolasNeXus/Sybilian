@@ -22,16 +22,16 @@ class Monster(Cards):
         assert(self.life > 0)
         if effect["Puissante"]==1:
             if card_2.effect["Puissante"]==1:
-                card_2.life--
-            else
+                card_2.life-=1
+            else:
                 card_2.life = 0
-            life--
+            life-=1
         else:
             if card_2.effect["Puissante"]==1:
                 life = 0
-            else
-                life--
-            card_2.life--
+            else:
+                life-=1
+            card_2.life-=1
 
 class Spell(Cards):
     def __init__(self, name : str, price : int, color : str, effect : dict):

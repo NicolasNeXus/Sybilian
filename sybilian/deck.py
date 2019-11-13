@@ -10,12 +10,14 @@ class Deck:
             with a LIFO
         """
         self.container = deque(my_container)
+        self.size = len(my_container)
 
     def draw(self):
         """
             Draw a card from the deck
             and return the card
         """
+        self.size-=1
         return self.container.pop()
 
     def add_end(self, card):
@@ -23,12 +25,14 @@ class Deck:
             Add a card at the end of the deck
         """
         self.container.appendleft(card)
+        self.size+=1
 
     def add(self, card):
         """
             Add a card to the deck
         """
         self.container.append(card)
+        self.size+=1
 
     def shuffle(self):
         """
@@ -46,6 +50,39 @@ class Deck:
         for cards in list(self.container):
             printable_content+=cards.__str__()+"\n"
         return printable_content
+class Hand(Deck):
+    def __init__(self, deck : Deck):
+        """
+            Keep a copy of the deck
+            within the hand. Linker.
+            Maxlen = 10 ?
+        """
+        self.container = deque([])
+        self.deck = deck
+        self.size = 0
+        for i in range(4):
+            self.add(deck.draw())
+
+    def draw(self):
+        """
+            add the drawn card to the hand
+        """
+        self.add(self.deck.draw())
+        self.size-=1 
+
+    def play(self, j):
+        """
+            play the j-th card of the game
+        """
+        self.size-=1
+        storage = deque([])
+        for i in range(j):
+            storage.append(self.container.pop())
+        card_j = self.container.pop()
+        for i in range(j):
+            self.container.append(storage.pop())
+        return card_j
+        
 
 def csv_to_deck(csv_file):
     """
@@ -86,3 +123,6 @@ if __name__=="__main__":
     card_2 = Counterspell("Armistice", 0, "Gris","Toutes les prochaines attaques sont contrés")
     card_3 = Spell("Boule de feu", 0, "Rouge", "L'adversaire perd un point de vie")
     deck = Deck([card_1, card_2, card_3])
+    deck_2 = csv_to_deck("draft_bleu.csv")
+
+
