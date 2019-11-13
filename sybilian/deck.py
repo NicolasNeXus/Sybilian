@@ -68,7 +68,6 @@ class Hand(Deck):
             add the drawn card to the hand
         """
         self.add(self.deck.draw())
-        self.size-=1 
 
     def play(self, j):
         """
@@ -97,23 +96,22 @@ def csv_to_deck(csv_file):
     with open(csv_file, newline = '') as csvfile:
         parse = csv.reader(csvfile, delimiter = ",", quotechar="|")
         for j,row in enumerate(parse):
-            if j==0:
-                pass
-            for i, cells in enumerate(row):
-                if i==0:
-                    name = cells
-                if i==1:
-                    color = cells
-                if i==2:
-                    type_card = cells
-                if i==3:
-                    effect = cells
-            if type_card == "Sort":
-                deck.add(Spell(name,0,color, effect))
-            if type_card == "Créature":
-                deck.add(Monster(name,1,color,"",effect))
-            if type_card == "Parade":
-                deck.add(Counterspell(name,0,color,effect))
+            if 0<j<=45:
+                for i, cells in enumerate(row):
+                    if i==0:
+                        name = cells
+                    if i==1:
+                        color = cells
+                    if i==2:
+                        type_card = cells
+                    if i==3:
+                        effect = cells
+                if type_card == "Sort":
+                    deck.add(Spell(name,0,color, effect))
+                if type_card == "Créature":
+                    deck.add(Monster(name,1,color,"",effect))
+                if type_card == "Parade":
+                    deck.add(Counterspell(name,0,color,effect))
     return deck
 
 
