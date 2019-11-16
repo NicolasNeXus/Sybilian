@@ -1,0 +1,9 @@
+from cards import *
+from deck import *
+from board import *
+from player import *
+
+board = Board()
+player_one = Player("draft_bleu.csv", board)
+player_two = Player("draft_rouge.csv", board)
+

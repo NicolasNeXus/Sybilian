@@ -1,0 +1,85 @@
+Nom,Couleur,Type,Effet,##,
+Furie,Rouge,Créature,Puissante. Destruction : perds 1 PV.,1,C
+Douleur,Rouge,Sort,"Perds 1 PV. Révèle ce PV. Si c'est un Dragon, pioche 3 cartes. Sinon, pioche 2 cartes.",2,C
+Embraser,Rouge,Sort,Perds 2 PV. Révèle ces PV. Fais surgir tout Dragon révélé ainsi.,3,R
+Explosion,Rouge,Contre,Condition : il ne doit pas y avoir de cartes dans tes PV.,4,C
+Ecaille-Dure,Rouge,Créature,Puissante. Destruction : l'adversaire révèle sa main ; cible 1 créature qui peut surgir s'il y en a ; l'adversaire fait surgir la créature ciblée.,5,SR
+Salamandre,Rouge,Créature,"Condition de pose : la somme des cartes dans les PV des deux joueurs doit être 7 ou moins. Impact : l'adversaire perd des PV jusqu'à en avoir autant que toi, puis termine ton tour immédiatement.",6,UR
+Vampire,Rouge,Créature,Puissante. Condition de pose : avoir 3 cartes dans tes PV ou moins.,7,R
+Dévastateur,Rouge,Créature,"A chaque fois que cette créature attaque et détruit une créature par combat, l'adversaire perd 1 PV. Fin de ton tour : détruit cette créature.",8,SR
+Boule de Feu,Rouge,Sort,"L'adversaire perd 1 PV. Si aucun Dragon allié n'a attaqué lors de ce tour, termine ton tour immédiatement.",9,C
+Peau Ardente,Rouge,Contre,Condition : l'adversaire doit avoir perdu des PV lors de ton tour précédent.,10,C
+Lien Vital,Rouge,Parade,Lorsque tu perds 1 PV alors que tu as déjà perdu 2 PV ou plus lors de ce tour : l'adversaire perd 1 PV et tu pioches 1 carte.,11,R
+Insensibilité,Rouge,Parade,Choisis : -Lorsqu'une créature avec un effet de Destruction est détruite : son effet de Destruction ne s'active pas ou -Lorsqu'une créature avec un Impact arrive sur le terrain : son Impact ne s'active pas.,12,C
+Wyvern,Rouge,Créature,Puissante. Condition de pose : il doit y avoir un autre Dragon sur le terrain. Destruction : cibles toutes les créatures alliées et blesse-les.,13,R
+Extinction de Masse,Rouge,Sort,Cible toutes les créatures non-Puissantes sur le terrain ; détruis ces cibles.,14,SR
+Pari Risqué,Rouge,Contre,"Prix : à la fin de ton prochain tour, tu perds la partie.",15,C
+Dernière Chance,Rouge,Sort,"Cible toutes les créatures alliées. Soigne toutes les cibles. Jusqu'à la fin du tour, toutes les Dragons sur le terrain sont Puissants. Jusqu'à la fin du tour, à chaque fois qu'un Dragon allié détruit une créature par combat, l'adversaire perd 1 PV. A la fin de ce tour, tu perds la partie.",16,UR
+Fournaise,Rouge,Créature,"Les effets de Destruction des créatures sur le terrain ne s'activent pas. A chaque fois qu'une créature avec un effet de Destruction est détruite, pioche 1 carte.",17,R
+Eruption,Rouge,Sort,"S'il y a un Oiseau sur le terrain, cible une créature. Renvoie la cible dans la main de son propriétaire. Si la cible est un Oiseau allié, l'adversaire perd 1 PV.",18,SR
+Execution,Rouge,Parade,Lorsque tu perds 1 PV à la suite d'une attaque de créature : détruis la créature qui vient de t'attaquer.,19,C
+Tranchefeu,Rouge,Contre,Condition : la créature attaquée doit avoir un effet de destruction.,20,C
+Carnage,Rouge,Sort,"Cible toutes les créatures adverses. Perd autant de PV que de cibles, puis détruis toutes les cibles.",21,R
+Petit Chaperon Rouge,Rouge,Créature,Impact : cible un [Grand Méchant Loup] dans ta PCS ; mélange la cible dans ton paquet.,22,C
+Sentiers Isolés,Rouge,Contre,Condition : il doit y avoir 4 cartes ou plus dans ton paquet. Prix : envoie les 4 cartes sur ton paquet dans ta PCS.,23,C
+Piégé dans la Forêt,Rouge,Sort,"Pioche 1 carte si tu le désires. Ensuite, si ton paquet est vide, cible jusqu'à 3 [Grand Méchant Loup] de ta PCS ; mélange les cibles dans ton paquet.",24,C
+Eclair Rouge,Rouge,Créature,"Impact : regarde tes PV ; cible 1 carte dans tes PV et perds ce PV. Ensuite, mélange tes PV et pioche 1 carte.",25,R
+Balle d'Argent,Rouge,Contre,"Condition : la créature attaquée est un [Grand Méchant Loup]. Effet Additionnel : si tu le désires, cible 1 [Grand Méchant Loup] dans ta PCS et mélange le dans ton paquet.",26,R
+Tir de Canon,Rouge,Sort,Technomagie : ce sort coûte [1] action. L'adversaire perd 1 PV.,27,SR
+Mirage de Magma,Rouge,Sort,"S'il y a un Démon sur le terrain, regarde tes PV et cible puis révèle une carte de tes PV, puis mélange les autres PV. Fais surgir la cible face cachée sous la forme d'une Ombre. Termine ton tour immédiatement.",28,SR
+Force Supérieure,Rouge,Contre,"Condition : la créature attaquée doit être Puissante, et la créature attaquante doit être non-Puissante.",29,C
+Vendre son Âme,Rouge,Sort,"Cible tous les Démons alliés. Détruis les cibles. Pour chaque cible détruite, l'adversaire perd 1 PV et tu pioches 1 carte.",30,C
+Incinérateur,Rouge,Créature,"Puissante. Cette créature est aussi un Sorcier. Destruction : défausse de ta main [3 cartes], ou [toute ta main] si tu as moins de 3 cartes en main.",31,UR
+Mecha-Dragon,Rouge,Créature,Puissante. Cette créature est aussi un Golem. Destruction : l'adversaire pioche 4 cartes.,32,C
+Fer Rouge,Rouge,Créature,Tous les Golems sont Puissants.,33,C
+Sombreflamme,Rouge,Créature,"Cette créature est aussi un Démon. Destruction : s'il y a d'autres Démons sur le terrain, l'adversaire perd 1 PV.",34,R
+Brûlure d'Acide,Rouge,Sort,"Choisis : -pioche 1 carte ; -l'adversaire perd 1 PV pour chaque exemplaire de cette carte dans ta défausse, puis envoie cette carte dans ta PCS.",35,C
+Artilleur,Rouge,Créature,Impact : révèle 5 Impériaux de ta main pour que l'adversaire perde 1 PV.,36,C
+Comète,Rouge,Créature,"Cette créature est aussi un Golem. Fragile. Lorsque cette créature fait perdre des PV à l'adversaire à la suite d'une attaque, l'adversaire perd 1 PV supplémentaire. Cette créature ne peut que charger.",37,
+Ebouillanter,Rouge,Contre,"Sans prix ni condition. Ton adversaire peut choisir d'annuler ce contre en perdant 1 PV ; s'il le fait, défausse ce contre.",38,
+Feu Electrique,Rouge,Contre,Condition : la somme des cartes dans les PV des deux joueurs doit être 8 ou moins.,39,
+Fandragon,Rouge,Créature,Puissante. Condition de Pose : l'adversaire a perdu 2 PV ou plus lors de ce tour.,40,
+Croque-Mitaine,Rouge,Créature,"A chaque fois qu'une Ombre arrive sur le terrain ou qu'une créature est transformée en Ombre, pioche une carte.",41,
+Décadence,Rouge,Contre,Condition : l'adversaire doit avoir 2 cartes ou moins dans ses PV.,42,
+Affamé,Rouge,Créature,"Impact : si l'adversaire a perdu des PV lors de ce tour, cible 1 créature et blesse la cible.",43,
+Axolotl Brûlant,Rouge,Créature,"Toutes les autres créatures alliées sont Puissantes et ont ""Destruction : perd 1 PV"".",44,
+Flammes Infernales,Rouge,Contre,Condition : la créature attaquée est un Démon.,45,
+Embrocher,Rouge,Parade,"Lorsqu'une créature alliée est détruite : s'il y a un Dragon sur le terrain, cible 1 créature et détruis la cible.",46,
+Bulbe Explosif,Rouge,Parade,"Lorsqu'un [Esprit Sylvestre] allié est détruit : si c'était la dernière créature sur ton terrain, l'adversaire perd 1 PV.",47,
+Incendiaire,Rouge,Créature,Ne peut attaquer. Fin de ton tour : l'adversaire perd 1 PV.,48,
+Soif de Sang,Rouge,Sort,"Pioche 4 cartes, puis défausse 3 cartes au hasard de ta main.",49,
+Serpent de Bronze,Rouge,Créature,"Cette créature est aussi un Golem. Lorsque cette créature en détruit une autre par combat, pioche 1 carte.",50,
+Crémation,Rouge,Sort,Cible jusqu'à 6 cartes dans la défausse d'un joueur; envoie les cibles dans la PCS de leur propriétaire. Pioche 1 carte.,51,
+La Broche,Rouge,Sort,Choisis : - Détruis un Oiseau ou un Ange ou -Pioche 1 carte.,52,
+Runes Sanglantes,Rouge,Sort,"Si tu as 3 cartes dans tes PV ou plus et ton paquet contient 3 cartes ou plus, perds tous tes PV. Ensuite, choisis dans ton paquet [3 cartes] qui sont mélangées dans tes PV.",53,
+Convection,Rouge,Sort,"Pioche 2 cartes. Ensuite, regarde la main de l'adversaire et cible 1 créature s'il y en a une, qui surgit chez l'adversaire.",54,
+Feu Follet,Rouge,Créature,"Cette créature est aussi un Oiseau. Impact : si ta main est vide, l'adversaire perd 1 PV.",55,
+Gobelin,Rouge,Créature,Fragile. Cette créature est aussi un Golem. Peut attaquer les créatures en deuxième ligne et l'adversaire même s'il y a des créatures sur la première ligne de l'adversaire.,56,
+Bûcher Divin,Rouge,Sort,Cible 1 Ange de ta main qui surgit. Perd 1 PV.,57,
+Napalm,Rouge,Créature,Ne peut attaquer. Fragile. Aucune créature alliée non-Impérial ne peut attaquer. Aucune créature adverse ne peut attaquer le tour où elle arrive sur le terrain.,58,
+Autophage,Rouge,Créature,"Tes sorts avec Technomagie coûtent 2 actions de moins. A chaque fois que tu joues un sort avec Technomagie, tu perds 2 PV.",65,
+Fin des Temps,Rouge,Sort,"Cible toutes les créatures sur le terrain, qui deviennent des Ombres puis sont détruites. Termine ton tour immédiatement.",60,
+Détonations,Rouge,Contre,Prix : cible et révèle 2 sorts avec Technomagie de ta main.,61,
+Chargeur Vide,Rouge,Sort,"Choisis : -pioche 1 carte ou -L'adversaire perd 1 PV. Ensuite, s'il n'a pas perdu, tu perds la partie.",62,
+Interruption,Rouge,Parade,"Lorsque l'adversaire perd 1 PV et qu'il y a 1 Dragon sur ton terrain : il termine son tour immédiatement, et tu ne gagnes pas d'actions au début du prochain tour.",63,
+Elémentaire de Sang,Rouge,Créature,"Impact : si tu as perdu des PV lors de ce tour, cible 1 créature et blesse-la.",64,
+Tortionnaire,Rouge,Créature,"Ne peut attaquer. A chaque fois qu'une créature Puissante arrive sur ton terrain, l'adversaire perd 1 PV.",65,
+Chair à Canon,Rouge,Sort,"Cible 1 créature alliée. L'adversaire perd 1 PV puis, si la créature ciblée est Puissante, il perd 1 PV supplémentaire. Ensuite, détruis la créature ciblée.",66,
+Blessure Stellaire,Rouge,Parade,Lorsque tu perds 1 PV : cible 1 [Esprit Solaire] de ta PCS et pose le sur ton paquet.,67,
+Feu de Forêt,Rouge,Sort,Cible les 4 cartes sur ton paquet et envoie les dans ta PCS. Pioche 2 cartes.,68,
+Amélioration Reptilienne,Rouge,Sort,Renvoie tous les [Pantins] de ta main dans ta PCS pour cibler autant de [Grand Méchant Loups] de ta PCS que de [Pantins] renvoyés ainsi ou moins et ajouter les cartes ciblées ainsi à ta main.,69,
+Dompteur de Géants,Rouge,Créature,"Impact : s'il y a une créature Puissante sur ton terrain, cible 1 créature et blesse-la.",70,
+Dernières Heures,Rouge,Sort,"Si ton paquet comporte 5 cartes ou plus, envoie ton paquet dans ta PCS. Ensuite, cible 5 cartes non-spéciales dans ta PCS et mélange-les dans ton paquet.",71,
+Moteur à Sang,Rouge,Créature,"Fragile. Ne peut attaquer. Cette créature est aussi un Impérial. Tes sorts avec Technomagie coûtent [2] actions de moins. A chaque fois que tu joues un sort avec Technomagie, tu perds 2 PV.",72,
+Géôlier,Rouge,Créature,"Lorsque l'adversaire va perdre 1 PV à la suite d'une attaque de créature Puissante alliée, l'adversaire perds 2 PV à la place. ",73,
+Portail Infernal,Rouge,Sort,"S'il y a un Démon sur le terrain, l'adversaire révèle sa main. S'il y a au moins 1 créature dans sa main, cible 1 créature dans sa main qui surgit, puis est transformée en Ombre face cachée. L'adversaire pioche ensuite 1 carte.",74,
+Brûler les Ecrits,Rouge,Sort,Cible jusqu'à 2 cartes dans la PCS de l'adversaire et défausse-les. Pioche 1 carte.,75,
+Brise-Bouclier,Rouge,Créature, ,76,
+Totem du Roi-Dragon,Rouge,Créature,Ne peut attaquer. Fragile. Fin de ton tour : détruis cette créature si elle est en première ligne. Toutes les créatures sur le terrain sont aussi des Dragons.,77,
+Cri de Victoire,Rouge,Parade,Lorsqu'une créature adverse est détruite par un effet allié : pioche 3 cartes.,78,
+Porte-Drapeau,Rouge,Créature,"Puissante. Cette créature est aussi un Impérial. Prix de Pose : cible 4 cartes sur le dessus de ton paquet et envoie les dans ta PCS. Début et Fin de ton tour : s'il y a 4 cartes ou plus sur ton paquet, cible 4 cartes sur le dessus de ton paquet et envoie les dans ta PCS.",79,
+Ecuyer Dragonnien,Rouge,Créature,"Fin de ton tour : si cette créature n'a pas infligé de dégâts à l'adversaire, détruis-la. Si elle a infligé des dégâts à l'adversaire, pioche 1 carte.",80,
+Dynamite,Rouge,Sort,"Révèle ta main. S'il y a 5 Impériaux ou plus dans ta main, l'adversaire perd 1 PV.",81,
+Plomb Ardent,Rouge,Sort,"L'adversaire pioche 1 carte pour chaque Golem sur ton terrain. Si l'adversaire a 10 cartes en main, il perd 1 PV.",82,
+Sang Empoisonné,Rouge,Parade,"Lorsque tu perds 1 PV : s'il y a un Sorcier dans ta défausse, l'adversaire défausse depuis sa main [2 cartes].",83,
+Garde Draconienne,Rouge,Créature,Coût en actions : [3]. Puissante. Cette créature coûte 1 action de moins pour chaque créature Puissante sur le terrain.,84,
