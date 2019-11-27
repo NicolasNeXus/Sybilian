@@ -3,13 +3,15 @@ from deck import *
 from board import *
 
 class Player:
-    def __init__(self, deck_name : str, board = Board) -> None:
+    def __init__(self, deck_name : str, board : Board, lines : list, first_line_other_player : int) -> None:
         self.deck = self.create_deck(deck_name)
         self.owner = deck_name
         self.life = Life(self.deck)
         self.hand = Hand(self.deck, self.life)
         self.grave = Graveyard()
         self.board = board
+        self.lines = lines
+        self.first_line_other_player = first_line_other_player
         self.other_player = None
 
     def __str__(self):
@@ -25,7 +27,12 @@ class Player:
             into the hand of
             the player
         """
-        self.hand.draw()
+        # Verify that the player have less than max_len cards in his hand
+        if self.hand.size < self.hand.max_len:
+            self.hand.draw()
+        # Add the card to the graveyard 
+        else:
+            self.grave.add(self.deck.draw())
  
     def draw_hp(self) -> None:
         """
@@ -34,8 +41,12 @@ class Player:
             into the hand of
             the player
         """
-        self.hand.draw_hp()
-
+        # Verify that the player have less than max_len cards in his hand
+        if self.hand.size < self.hand.max_len:
+            self.hand.draw_hp()
+        # Add the card to the graveyard 
+        else:
+            self.grave.add(self.life.draw())
 
     def create_deck(self, deck_name : str):
         """
@@ -50,27 +61,39 @@ class Player:
             Attack the other Monster
             on the board directly
         """
+        assert isinstance(card, Monster) and isinstance(other_card, Monster)
+        #self.card.attack(other_card) quand on aura implémenter l'effet puissant
         card.life-=1
         other_card.life-=1
         self.board.clean()
         self.empty_purgatory()
         self.other_player.empty_purgatory()
+    
+    def verify_first_line_opponent_empty(self) -> bool:
+        """ 
+            Verify that the first line
+            of the opponent is empty
+            Return True if it's empty
+        """
+        empty = not isinstance(self.board.grid[self.first_line_other_player][0], Monster)
+        for i in range(1, 3):
+            empty = empty and not isinstance(self.board.grid[self.first_line_other_player][i], Monster)
+        return empty
 
     def attack_player_with_monster(self, card : Monster, other_player) -> None:
         """
             Attack the other player
             directly. 
             /!\ must verify that
-            there is nothing on the
-            first line
-            /!\ must verify that
             attack can't be countered
         """
-        other_player.draw_hp()
-        print("the hp is drawn")
-        card.life-=1
-        self.board.clean()
-        self.empty_purgatory()
+        # Verify that the first line of the opponent is empty
+        if self.verify_first_line_opponent_empty():
+            other_player.draw_hp()
+            print("the hp is drawn")
+            card.life-=1
+            self.board.clean()
+            self.empty_purgatory()
 
     def empty_purgatory(self) -> None:
         """
@@ -87,23 +110,37 @@ class Player:
             print(self.owner)
             # One should apply here the effect on the card
             if (card_purgatory.owner == self.owner):
-                self.grave.add(card_purgatory)
+                self.grave.add(card_purgatory) #après regarder si ya les effets de destruction...
+            # c'est les cartes de l'adversaire on les "réempile" dans le purgatoire
             else:
-                storage_size+=1
+                storage_size+=1 
                 storage.append(card_purgatory)
         for i in range(storage_size):
             self.board.purgatory.add(storage.pop())
         
-
+    def verify_coord(self, coord : tuple) -> bool:
+        """
+           Verify that the co-ordinates are valid 
+           Return True if they are valid
+        """
+        i, j = coord
+        # The co-ordinates correspond to the lines of the player
+        if i in self.lines and j in [0, 1, 2]:
+            # The emplacement is empty
+            if not isinstance(self.board.grid[i][j], Monster):
+                return True
+            else:
+                return False
+        return False
+        
     def play(self, j : int, coord : tuple = (0,0)) -> None:
         """
             The player plays a card from
             its hand on the board at the
             position coord
-            /!\ must test the coord because
-            we can't play on the ennemy's board
         """
         card_played = self.hand.play(j)
         if isinstance(card_played, Monster):
             card_played.coord = coord
-            self.board.play(card_played, coord)
+            if self.verify_coord(coord):
+                self.board.play(card_played, coord)
