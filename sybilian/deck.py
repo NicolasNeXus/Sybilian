@@ -50,7 +50,7 @@ class Deck:
         """
         printable_content = ""
         for cards in list(self.container):
-            printable_content+=cards.__str__()+"\n"
+            printable_content+=cards.__str__()+"\n"+"\n"
         return printable_content
 
 
@@ -71,11 +71,12 @@ class Hand(Deck):
         """
             Keep a copy of the deck
             within the hand. Linker.
-            Maxlen = 10 ?
+            The deck contains 10 cards max.
         """
         super().__init__([])
         self.deck = deck
         self.life = life
+        self.max_len = 10
         for i in range(4):
             self.add(deck.draw())
 
@@ -93,7 +94,7 @@ class Hand(Deck):
         """
         self.add(self.life.draw())
 
-    def play(self, j : int) -> None:
+    def play(self, j : int) -> Card:
         """
             play the j-th card of the hand
         """
@@ -151,7 +152,7 @@ def csv_to_deck(csv_file : str) -> Deck:
                         effect = cells
                 if type_card == "Sort":
                     deck.add(Spell(name,0,color, effect, csv_file))
-                if type_card == "Créature":
+                if type_card == "Creature":
                     deck.add(Monster(name,1,color,"",effect, csv_file))
                 if type_card == "Parade":
                     deck.add(Counterspell(name,0,color,effect, csv_file))

@@ -7,6 +7,7 @@ class Player:
         self.deck = self.create_deck(deck_name)
         self.owner = deck_name
         self.life = Life(self.deck)
+        self.life_points = self.life.size + 1
         self.hand = Hand(self.deck, self.life)
         self.grave = Graveyard()
         self.board = board
@@ -27,12 +28,16 @@ class Player:
             into the hand of
             the player
         """
-        # Verify that the player have less than max_len cards in his hand
-        if self.hand.size < self.hand.max_len:
-            self.hand.draw()
-        # Add the card to the graveyard 
+        # The deck still have at least one card
+        if self.deck.size >= 1:
+            # Verify that the player have less than max_len cards in his hand
+            if self.hand.size < self.hand.max_len:
+                self.hand.draw()
+            # Add the card to the graveyard 
+            else:
+                self.grave.add(self.deck.draw())
         else:
-            self.grave.add(self.deck.draw())
+            print("Il n'y a plus de cartes dans la pioche")
  
     def draw_hp(self) -> None:
         """
@@ -41,12 +46,16 @@ class Player:
             into the hand of
             the player
         """
-        # Verify that the player have less than max_len cards in his hand
-        if self.hand.size < self.hand.max_len:
-            self.hand.draw_hp()
-        # Add the card to the graveyard 
-        else:
-            self.grave.add(self.life.draw())
+        self.life_points -= 1
+        # The life deck still have at least one card
+        if self.life.size >= 1:
+            # Verify that the player have less than max_len cards in his hand
+            if self.hand.size < self.hand.max_len:
+                self.hand.draw_hp()
+            # Add the card to the graveyard 
+            else:
+                self.grave.add(self.life.draw())
+
 
     def create_deck(self, deck_name : str):
         """
@@ -94,6 +103,8 @@ class Player:
             card.life-=1
             self.board.clean()
             self.empty_purgatory()
+        else:
+            print("Impossible d'attaquer directement l'adversaire")
 
     def empty_purgatory(self) -> None:
         """
@@ -130,7 +141,9 @@ class Player:
             if not isinstance(self.board.grid[i][j], Monster):
                 return True
             else:
+                print("Il n'y a pas de monstre sur cette case")
                 return False
+        print("Cette case ne correspond pas à une case de votre adversaire")
         return False
         
     def play(self, j : int, coord : tuple = (0,0)) -> None:
@@ -140,7 +153,6 @@ class Player:
             position coord
         """
         card_played = self.hand.play(j)
-        if isinstance(card_played, Monster):
-            card_played.coord = coord
-            if self.verify_coord(coord):
-                self.board.play(card_played, coord)
+        card_played.coord = coord
+        if self.verify_coord(coord):
+            self.board.play(card_played, coord)

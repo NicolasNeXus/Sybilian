@@ -1,0 +1,98 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Nov 29 11:08:41 2019
+
+@author: clari
+"""
+
+from cards import *
+from deck import *
+from board import *
+from player import *
+
+class Game:
+    def __init__(self) -> None:
+        self.board = Board()
+        # player_one has access to the first and second lines of the board
+        # player_two has access to the third and fourth lines of the board
+        self.players = (Player("draft_bleu.csv", self.board, [0, 1], 2), Player("draft_rouge.csv", self.board, [2, 3], 1))
+        self.players[0].other_player = self.players[1]
+        self.players[1].other_player = self.players[0]
+        self.nb_turns = 0
+        self.end = False
+    
+    def condition_endgame(self) -> bool:
+        """
+            return True if a player won,
+            False otherwise
+        """
+        if self.players[0].life_points > 0 and self.players[1].life_points > 0:
+            return False
+        elif self.players[0].life_points == 0:
+            print("Le joueur 2 a gagné!")
+            return True
+        elif self.players[1].life_points == 0:
+            print("Le joueur 1 a gagné!")
+            return True
+    
+    def turn(self):
+        """
+            /!\ pour l'instant un joueur peut juste jouer des monstres
+        """
+        nb_actions = 2
+        while nb_actions > 0:
+            action = str(input("Entrer 'p' pour piocher une carte, 'j' pour jouer une carte, 'm' pour regarder les cartes dans votre main: "))
+            if action == 'p':
+                self.players[self.nb_turns%2].draw()
+                nb_actions -= 1
+            elif action == 'm':
+                print(self.players[self.nb_turns%2].hand)
+            elif action == 'j':
+                j = int(input("Quelle carte voulez-vous jouer (entrer un nombre entre 1 et "+str(self.players[self.nb_turns%2].hand.size) +"): "))
+                if isinstance(self.players[self.nb_turns%2].hand.play(j), Monster):
+                    x = int(input("Sur quelle ligne voulez-vous jouer votre carte (" + str(self.players[self.nb_turns%2].lines[0]) +" ou " + str(self.players[self.nb_turns%2].lines[1]) + "): "))
+                    y = int(input("Sur quelle colonnes voulez-vous jouer votre carte (0 ou 1 ou 2): "))
+                    self.players[self.nb_turns%2].play(j, (x, y))
+                    nb_actions -= self.board.grid[x][y].price
+                elif isinstance(self.players[self.nb_turns%2].hand.play(j), Spell):
+                    #voir ensuite comment faire pour les sorts 
+                    nb_actions -= self.players[self.nb_turns%2].hand.play(j).price
+                    self.board.purgatory.add(self.players[self.nb_turns%2].hand.play(j)) 
+        
+        print(self.board)
+        # Player are allowed to attack after their first turn
+        if self.nb_turns > 1:
+            attack = str(input("Entrer 'm' pour attaquer un monstre de l'adversaire, 'a' pour attaquer directement votre adversaire, 't' pour terminer votre tour"))
+            while attack != 't':
+                if attack == 'm':
+                    #vérifier que c'est bien le monstre du joueur???
+                    x = int(input("Ligne de votre monstre qui attaque: "))
+                    y = int(input("Colonne de votre monstre qui attaque: "))
+                    x_other_player = int(input("Ligne du monstre que vous voulez attaquer"))
+                    y_other_player = int(input("Colonne du monstre que vous voulez attaquer"))
+                    self.players[self.nb_turns%2].attack_monster(self.board[x][y], self.board[x_other_player][y_other_player])
+                if attack == 'a':
+                    x = int(input("Ligne de votre monstre qui attaque: "))
+                    y = int(input("Colonne de votre monstre qui attaque: "))
+                    self.players[self.nb_turns%2].attack_player_with_monster(self.board[x][y], self.players[(self.nb_turns + 1 )%2])
+            attack = str(input("Entrer 'm' pour attaquer un monstre de l'adversaire, 'a' pour attaquer directement votre adversaire, 't' pour terminer votre tour"))
+            print(self.board)
+    
+    def game_loop(self):
+        while not self.end:
+            self.turn()
+            self.nb_turns += 1
+            self.end = self.condition_endgame()
+                    
+                    
+        
+        
+        
+                
+                
+                
+                
+                
+        
+            
+            
