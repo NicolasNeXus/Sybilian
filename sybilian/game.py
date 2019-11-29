@@ -74,7 +74,7 @@ class Game:
                 if attack == 'a':
                     x = int(input("Ligne de votre monstre qui attaque: "))
                     y = int(input("Colonne de votre monstre qui attaque: "))
-                    self.players[self.nb_turns%2].attack_player_with_monster(self.board[x][y], self.players[(self.nb_turns + 1 )%2])
+                    self.players[self.nb_turns%2].attack_player_with_monster(self.board.grid[x][y], self.players[(self.nb_turns + 1 )%2])
             attack = str(input("Entrer 'm' pour attaquer un monstre de l'adversaire, 'a' pour attaquer directement votre adversaire, 't' pour terminer votre tour"))
             print(self.board)
     
