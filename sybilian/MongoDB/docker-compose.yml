@@ -1,0 +1,17 @@
+version : '3'
+services:
+  database:
+    image : 'mongo'
+    container_name: 'mongo-sybilian'
+    environment:
+      - MONGO_INITDB_DATABASE=sybiliandb
+      - MONGO_INITDB_ROOT_USERNAME=root_sybi
+      - MONGO_INITDB_ROOT_PASSWORD=toor
+    volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+      - /data/db
+    ports:
+      - "27017:27017"
+volumes:
+  mongodb_data:
+    driver: local

@@ -19,7 +19,7 @@ class Card():
         printable_content = self.__class__.__name__ + " | "
         printable_content+= "Name : "+self.name+ " | "
         printable_content+= "Price : "+str(self.price) + " | "
-        printable_content+= "Effect : "+self.effect
+        printable_content+= "Effect : "+str(self.effect)
         return printable_content
 
 class Monster(Card):
