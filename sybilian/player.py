@@ -1,6 +1,7 @@
 from cards import *
 from deck import *
 from board import *
+from bdd import *
 
 class Player:
     def __init__(self, deck_name : str, board : Board, lines : list, first_line_other_player : int) -> None:
