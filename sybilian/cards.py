@@ -22,6 +22,18 @@ class Card():
         printable_content+= "Effect : "+str(self.effect)
         return printable_content
 
+class Placeholder(Card):
+    """
+        A object used for the
+        interface. It's a
+        placeholder for cards.
+    """
+    def __init__(self):
+        self.name = "placeholder"
+        self.price = 0
+        self.effect = {}
+
+
 class Monster(Card):
     """
         A monster is a card that cost 1
