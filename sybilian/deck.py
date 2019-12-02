@@ -85,22 +85,32 @@ class Hand():
             add a card to the hand
             container
         """
-        self.container.append(card)
+        if len(self.container) < 10:
+            self.container.append(card)
 
+    def read_card(self, i : int) -> Monster:
+        """
+            Return a reference to
+            the card in the hand
+            at the position i
+        """
+        return self.container[i]
 
     def draw(self) -> None:
         """
             add the drawn card to the hand.
             The card comes from the deck
         """
-        self.add(self.deck.draw())
+        if len(self.container) < 10:
+            self.add(self.deck.draw())
 
     def draw_hp(self) -> None:
         """
             add the drawn card to the hand.
             The card comes from the health
         """
-        self.add(self.life.draw())
+        if len(self.container) < 10:
+            self.add(self.life.draw())
 
     def play(self, j : int) -> Card:
         """
