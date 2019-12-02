@@ -68,4 +68,3 @@ class Counterspell(Card):
     def __init__(self, name : str, price : int, color : str, effect : dict, owner : str = None) -> None:
         super().__init__(name, 0, color, effect, owner)
 
-
