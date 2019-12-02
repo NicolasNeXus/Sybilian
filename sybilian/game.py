@@ -50,14 +50,14 @@ class Game:
                 print(self.players[self.nb_turns%2].hand)
             elif action == 'j':
                 j = int(input("Quelle carte voulez-vous jouer (entrer un nombre entre 1 et "+str(self.players[self.nb_turns%2].hand.size) +"): "))
-                if isinstance(self.players[self.nb_turns%2].hand.play(j), Monster):
+                if isinstance(self.players[self.nb_turns%2].hand.read_card(j - 1), Monster):
                     x = int(input("Sur quelle ligne voulez-vous jouer votre carte (" + str(self.players[self.nb_turns%2].lines[0]) +" ou " + str(self.players[self.nb_turns%2].lines[1]) + "): "))
                     y = int(input("Sur quelle colonnes voulez-vous jouer votre carte (0 ou 1 ou 2): "))
                     self.players[self.nb_turns%2].play(j, (x, y))
                     nb_actions -= self.board.grid[x][y].price
-                elif isinstance(self.players[self.nb_turns%2].hand.play(j), Spell):
+                elif isinstance(self.players[self.nb_turns%2].hand.read_card(j - 1), Spell):
                     #voir ensuite comment faire pour les sorts 
-                    nb_actions -= self.players[self.nb_turns%2].hand.play(j).price
+                    nb_actions -= self.players[self.nb_turns%2].hand.read_card(j).price
                     self.board.purgatory.add(self.players[self.nb_turns%2].hand.play(j)) 
                     
         # Player are allowed to attack after their first turn
@@ -77,7 +77,7 @@ class Game:
                     self.players[self.nb_turns%2].attack_player_with_monster(self.board.grid[x][y], self.players[(self.nb_turns + 1 )%2])
                 elif action == 'c':
                     print(self.players[self.nb_turns%2].hand)
-            attack = str(input("Entrer 'm' pour attaquer un monstre de l'adversaire, 'a' pour attaquer directement votre adversaire, 't' pour terminer votre tour"))
+            attack = str(input("Entrer 'm' pour attaquer un monstre de l'adversaire, 'a' pour attaquer directement votre adversaire, 'c' pour regarder les cartes dans votre main, 't' pour terminer votre tour"))
             print(self.board)
     
     def game_loop(self):

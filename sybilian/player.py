@@ -70,13 +70,20 @@ class Player:
             Attack the other Monster
             on the board directly
         """
-        assert isinstance(card, Monster) and isinstance(other_card, Monster)
         #self.card.attack(other_card) quand on aura implémenter l'effet puissant
-        card.life-=1
-        other_card.life-=1
-        self.board.clean()
-        self.empty_purgatory()
-        self.other_player.empty_purgatory()
+        if isinstance(card, Monster) and isinstance(other_card, Monster):
+            if card.owner == self.owner:
+                if other_card.owner == self.other_player.owner:
+                    card.life-=1
+                    other_card.life-=1
+                    self.board.clean()
+                    self.empty_purgatory()
+                    self.other_player.empty_purgatory()
+                
+                else:
+                    print("Le monstre que vous voulez attaquer n'est pas un monstre de l'adversaire")
+            else:
+                print("Le monstre qui doit attaquer n'est pas un de vos monstres")
     
     def verify_first_line_opponent_empty(self) -> bool:
         """ 
