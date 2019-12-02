@@ -152,35 +152,3 @@ class Graveyard(Deck):
             self.container.append(storage.pop())
         return card_j
 
-
-
-def csv_to_deck(csv_file : str) -> Deck:
-    """
-        Basic function to create a deck
-        from a csv file. Used for dev only
-    """
-    deck = Deck([])
-    name = None
-    color = None
-    type_card = None
-    effect = None
-    with open(csv_file, newline = '') as csvfile:
-        parse = csv.reader(csvfile, delimiter = ",", quotechar="|")
-        for j,row in enumerate(parse):
-            if 0<j<=45:
-                for i, cells in enumerate(row):
-                    if i==0:
-                        name = cells
-                    if i==1:
-                        color = cells
-                    if i==2:
-                        type_card = cells
-                    if i==3:
-                        effect = cells
-                if type_card == "Sort":
-                    deck.add(Spell(name,0,color, effect, csv_file))
-                if type_card == "Creature":
-                    deck.add(Monster(name,1,color,"",effect, csv_file))
-                if type_card == "Parade":
-                    deck.add(Counterspell(name,0,color,effect, csv_file))
-    return deck
