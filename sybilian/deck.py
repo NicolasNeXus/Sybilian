@@ -66,19 +66,27 @@ class Life(Deck):
         for i in range(9):
             self.add(deck.draw())
 
-class Hand(Deck):
+class Hand():
     def __init__(self, deck : Deck, life : Life) -> None:
         """
             Keep a copy of the deck
             within the hand. Linker.
             The deck contains 10 cards max.
         """
-        super().__init__([])
+        self.container = list()
         self.deck = deck
         self.life = life
         self.max_len = 10
         for i in range(4):
             self.add(deck.draw())
+
+    def add(self, card : Monster) -> None:
+        """
+            add a card to the hand
+            container
+        """
+        self.container.append(card)
+
 
     def draw(self) -> None:
         """

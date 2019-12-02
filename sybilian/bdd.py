@@ -19,8 +19,8 @@ def upload_csv_bdd(csv_file : str) -> None:
     """
         Connect to the BDD and
         append all the new cards
-        /!\ we don't the card already
-        exists
+        /!\ we don't check if the
+        card already exists
     """
     with open(csv_file, newline = '') as csvfile:
         parse = csv.reader(csvfile, delimiter = ",", quotechar="|")
@@ -50,7 +50,6 @@ def pull_card(id_card : str) -> Monster:
     cursor = COLLECTION.find({"id":id_card})
     for cards in cursor:
         return Monster(cards["name"], 1, cards["color"], cards["kin"], cards["effect"], cards["id"])
-
 
 
 def show_bdd() -> None:
