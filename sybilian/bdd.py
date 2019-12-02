@@ -5,6 +5,7 @@ from re import sub
 from yaml import safe_load
 
 from cards import *
+from deck import *
 
 CLIENT = MongoClient('mongodb://TDLOG:sybilian@127.0.0.1:27017/sybiliandb')
 DB = CLIENT.sybiliandb
@@ -50,6 +51,19 @@ def pull_card(id_card : str) -> Monster:
     cursor = COLLECTION.find({"id":id_card})
     for cards in cursor:
         return Monster(cards["name"], 1, cards["color"], cards["kin"], cards["effect"], cards["id"])
+
+
+def csv_to_deck(csv_file : str) -> Deck:
+    """
+        Function that reads a csv
+        of ID and return a Deck
+    """
+    deck = Deck([])
+    with open(csv_file, newline = '') as csvfile:
+        parse = csv.reader(csvfile, delimiter = ",", quotechar = "|")
+        for j,row in enumerate(parse):
+            deck.add(pull_card(row[0]))
+    return deck
 
 
 def show_bdd() -> None:
