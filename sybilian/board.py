@@ -11,7 +11,7 @@ class Board:
             We create an empty grid
             with the purgatory zone
         """
-        self.grid = [[Card("void","-1","","") for i in range(3)] for j in range(4)]
+        self.grid = [[Placeholder()] for i in range(3)] for j in range(4)]
         self.purgatory = Deck([])
 
     def __str__(self) -> None:

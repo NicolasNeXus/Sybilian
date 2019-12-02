@@ -126,6 +126,15 @@ class Hand():
         return card_j
         
 
+    def __str__(self) -> str:
+        """
+            Print a hand
+        """
+        printable_content = ""
+        for cards in list(self.container):
+            printable_content+=cards.__str__()+"\n"+"\n"
+        return printable_content
+
 class Graveyard(Deck):
     def __init__(self) -> None:
         super().__init__([])
