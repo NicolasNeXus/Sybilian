@@ -125,7 +125,6 @@ class Hand():
             self.container.append(storage.pop())
         return card_j
         
-
     def __str__(self) -> str:
         """
             Print a hand
