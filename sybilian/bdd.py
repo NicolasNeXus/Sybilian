@@ -25,6 +25,7 @@ def upload_csv_bdd(csv_file : str) -> None:
     """
     with open(csv_file, newline = '') as csvfile:
         parse = csv.reader(csvfile, delimiter = ",", quotechar="|")
+        card_list = []
         for j, row in enumerate(parse):
             try:
                 json = dict()
