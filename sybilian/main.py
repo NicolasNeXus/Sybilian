@@ -5,8 +5,4 @@ from player import *
 from game import *
 
 game = Game()
-#game.game_loop()
-
-
-
-
+game.game_loop()
