@@ -167,13 +167,16 @@ class Player:
         print("Cette case ne correspond pas à une case de votre adversaire")
         return False
         
-    def play(self, j : int, coord : tuple = (0,0)) -> None:
+    def play(self, j : int, coord : tuple = (0,0)) -> bool:
         """
             The player plays a card from
             its hand on the board at the
-            position coord
+            position coord. 
+            Return True if the card is
+            actually played
         """
         card_played = self.hand.play(j)
         card_played.coord = coord
         if self.verify_coord(coord):
             self.board.play(card_played, coord)
+        
