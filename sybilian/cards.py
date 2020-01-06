@@ -23,7 +23,7 @@ class Card(QLabel):
         self.win = parent # parent window
         self.image = "monster.png" # card representation
         self.width = 50
-        self.height = 100
+        self.height = 70
 
     def __str__(self) -> str:
         """

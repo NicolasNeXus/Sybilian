@@ -39,7 +39,17 @@ class Game(QWidget):
         self.initUi()
         self.position = [[QRect(150*j + 100, 100 + 150 * i, 50, 100) for j in range(3)] for i in range(2)] + [[QRect(150*j + 100, 400 + 150 * i, 50, 100) for j in range(3)] for i in range(2)]
         self.color = [[QColor(255, 0, 0, 200) for j in range(3)] for i in range(2)] + [[QColor(0, 0, 255, 200) for j in range(3)] for i in range(2)]
-        
+        self.initHand()
+        self.index_current_card = -1
+    
+    def initHand(self) -> None:
+        # display the hand of the current player
+        player = self.players[self.nb_turns%2] # current player
+        for i in range(len(player.hand.container)):
+            card = player.hand.container[i]  
+            card.setPixmap(QPixmap("monster.png"))
+            card.move(20 + 70*i, 700)
+    
     def initUi(self) -> None:
         # event for changing turns 
         def change_turn():
@@ -48,6 +58,7 @@ class Game(QWidget):
             self.ongo_attack = False
             self.nb_turns += 1
             self.end = self.condition_endgame()
+            self.initHand()
         
         self.finish_turn.move(700, 300)
         self.finish_turn.clicked.connect(change_turn)
@@ -71,6 +82,10 @@ class Game(QWidget):
 
     def dragEnterEvent(self, e):
         e.accept()
+        for i in range(len(self.players[self.nb_turns%2].hand.container)):
+            card = self.players[self.nb_turns%2].hand.container[i]
+            if QRect(card.x(), card.y(), card.width, card.height).contains(e.pos()):
+                self.index_current_card = i
               
     # to play cards on the board (drag'n'drop)
     def dropEvent(self, e):
@@ -78,9 +93,10 @@ class Game(QWidget):
         for i in range(len(self.board.grid)):
             for j in range(len(self.board.grid[0])):
                 if self.position[i][j].contains(position):
-                    self.players[self.nb_turns%2].play(0, (i, j))
+                    self.players[self.nb_turns%2].play(self.index_current_card, (i, j))
                     self.nb_actions -= self.board.grid[i][j].price
-                    self.players[self.nb_turns%2].hand.container[0].move(0,0)#self.position[i][j].x(), self.position[i][j].y())
+                    self.players[self.nb_turns%2].hand.container[self.index_current_card].move(self.position[i][j].x(), self.position[i][j].y())
+                    self.index_current_card = -1
                     e.setDropAction(Qt.MoveAction)
                     e.accept() 
         self.update()
@@ -100,12 +116,6 @@ class Game(QWidget):
                 painter.setPen(pen)
                 painter.drawRect(self.position[i][j])
                 painter.fillRect(self.position[i][j], self.color[i][j])
-        # display the hand of the current player
-        player = self.players[self.nb_turns%2] # current player
-        for i in range(len(player.hand.container)):
-            card = player.hand.container[i]  
-            card.setPixmap(QPixmap("monster.png"))
-            card.move(20 + 70*i, 700)
         painter.end()
 
     
@@ -135,7 +145,7 @@ class Game(QWidget):
                             if self.board.grid[x_other_player][y_other_player].life > 0:
                                 self.color[i][j] = QColor(105, 105, 105, 200)
                             else:
-                                if nb_turns%2 == 0:
+                                if self.nb_turns%2 == 0:
                                     self.color[i][j] = QColor(0, 0, 255, 200)
                                 else:
                                     self.color[i][j] = QColor(255, 0, 0, 200)
