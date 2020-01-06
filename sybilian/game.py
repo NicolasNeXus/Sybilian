@@ -24,7 +24,7 @@ class Game(QWidget):
         self.board = Board()
         # player_one has access to the first and second lines of the board
         # player_two has access to the third and fourth lines of the board
-        self.players = (Player("draft_bleu.csv", self.board, [0, 1], 2), Player("draft_rouge.csv", self.board, [2, 3], 1))
+        self.players = (Player("deckA005.csv", self.board, [0, 1], 2), Player("deckB001.csv", self.board, [2, 3], 1))
         self.players[0].other_player = self.players[1]
         self.players[1].other_player = self.players[0]
         self.nb_turns = 0
@@ -67,7 +67,7 @@ class Game(QWidget):
         elif self.players[1].life_points == 0:
             print("Le joueur 1 a gagné!")
             return True
-    
+
     def dragEnterEvent(self, e):
         e.accept()
               
@@ -81,52 +81,8 @@ class Game(QWidget):
                     self.nb_actions -= self.board.grid[i][j].price
                     self.players[self.nb_turns%2].hand.container[0].move(self.position[i][j].x(), self.position[i][j].y())
                     e.setDropAction(Qt.MoveAction)
-                    e.accept()
-    
-#    def turn(self):
-#        """
-#            /!\ pour l'instant un joueur peut juste jouer des monstres
-#        """
-#        self.nb_actions = 2
-#        while self.nb_actions > 0:
-            #print(self.board)
-            #action = str(input("Entrer 'p' pour piocher une carte, 'j' pour jouer une carte, 'c' pour regarder les cartes dans votre main: "))
-            #if action == 'p':
-                
-#                self.players[self.nb_turns%2].draw()
-#                # faire apparaitre carte sur le terrain (main du joueur)
-#                self.nb_actions -= 1
-                
-#            elif action == 'c':
-#                print(self.players[self.nb_turns%2].hand)
-                    
-                # Carte SORTS !!!!!!!!!!
-#                elif isinstance(self.players[self.nb_turns%2].hand.read_card(j - 1), Spell):
-#                    # voir ensuite comment faire pour les sorts 
-#                    self.nb_actions -= self.players[self.nb_turns%2].hand.read_card(j).price
-#                    self.board.purgatory.add(self.players[self.nb_turns%2].hand.play(j)) 
-                    
-                    
+                    e.accept()                    
                                     
-        # Player are allowed to attack after their first turn
-#        if self.nb_turns > 1:
-#            #attack = str(input("Entrer 'm' pour attaquer un monstre de l'adversaire, 'a' pour attaquer directement votre adversaire, 'c' pour regarder les cartes dans votre main, 't' pour terminer votre tour"))
-#            while attack != 't':
-#                if attack == 'm':
-#                    #vérifier que c'est bien le monstre du joueur???
-#                    x = int(input("Ligne de votre monstre qui attaque: "))
-#                    y = int(input("Colonne de votre monstre qui attaque: "))
-#                    x_other_player = int(input("Ligne du monstre que vous voulez attaquer"))
-#                    y_other_player = int(input("Colonne du monstre que vous voulez attaquer"))
-#                    self.players[self.nb_turns%2].attack_monster(self.board.grid[x][y], self.board.grid[x_other_player][y_other_player])
-#                elif attack == 'a':
-#                    x = int(input("Ligne de votre monstre qui attaque: "))
-#                    y = int(input("Colonne de votre monstre qui attaque: "))
-#                    self.players[self.nb_turns%2].attack_player_with_monster(self.board.grid[x][y], self.players[(self.nb_turns + 1 )%2])
-#                elif action == 'c':
-#                    print(self.players[self.nb_turns%2].hand)
-#            attack = str(input("Entrer 'm' pour attaquer un monstre de l'adversaire, 'a' pour attaquer directement votre adversaire, 'c' pour regarder les cartes dans votre main, 't' pour terminer votre tour"))
-#            print(self.board)
     
     def game_loop(self):
         while not self.end:

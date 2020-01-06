@@ -81,8 +81,7 @@ class Player:
                     other_card.life-=1
                     self.board.clean()
                     self.empty_purgatory()
-                    self.other_player.empty_purgatory()
-                
+                    self.other_player.empty_purgatory()    
                 else:
                     print("Le monstre que vous voulez attaquer n'est pas un monstre de l'adversaire")
             else:
@@ -116,6 +115,17 @@ class Player:
         else:
             print("Impossible d'attaquer directement l'adversaire")
 
+    def effect_destruction(self, card : Monster) -> None:
+        if "Destruction" in card.effect.keys():
+            if card.effect["Desctruction"]["Condition"] == "None":
+                if "Lose_HP" in card.effect["Destruction"]["Event"]["Do"].keys():
+                    for i in range(cards.effect["Desctruction"]["Event"]["Do"]["Lose_HP"]["Amount"]):
+                        if cards.effect["Desctruction"]["Event"]["Do"]["Lose_HP"]["Owner"] == "Player": 
+                            self.draw_hp()
+                        else:
+                            self.other_player.draw_hp()
+
+
     def empty_purgatory(self) -> None:
         """
             Put the monster within the
@@ -131,6 +141,7 @@ class Player:
             print(self.owner)
             # One should apply here the effect on the card
             if (card_purgatory.owner == self.owner):
+                self.effect_destruction(card_purgatory)
                 self.grave.add(card_purgatory) #après regarder si ya les effets de destruction...
             # c'est les cartes de l'adversaire on les "réempile" dans le purgatoire
             else:
@@ -140,7 +151,7 @@ class Player:
             self.board.purgatory.add(storage.pop())
         
     def verify_coord(self, coord : tuple) -> bool:
-        """
+        """ 
            Verify that the co-ordinates are valid 
            Return True if they are valid
         """
