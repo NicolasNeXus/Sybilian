@@ -8,7 +8,7 @@ from json import loads
 from cards import *
 from deck import *
 
-CLIENT = MongoClient('mongodb://TDLOG:sybilian@192.168.99.100:27017/sybiliandb')
+CLIENT = MongoClient('mongodb://TDLOG:sybilian@127.0.0.1:27017/sybiliandb')
 DB = CLIENT.sybiliandb
 COLLECTION = DB.cards
 COULEUR = {"A" : "blue", "B" : "red", "C" : "orange", "D" : "yellow", "E" : "gray", "F" : "green", "G" : "purple" }

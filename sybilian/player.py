@@ -77,8 +77,7 @@ class Player:
         if isinstance(card, Monster) and isinstance(other_card, Monster):
             if card.owner == self.owner:
                 if other_card.owner == self.other_player.owner:
-                    card.life-=1
-                    other_card.life-=1
+                    card.attack(other_card)
                     self.board.clean()
                     self.empty_purgatory()
                     self.other_player.empty_purgatory()    
@@ -116,6 +115,10 @@ class Player:
             print("Impossible d'attaquer directement l'adversaire")
 
     def effect_destruction(self, card : Monster) -> None:
+        """
+            Trigger destruction
+            effect of a card
+        """
         if "Destruction" in card.effect.keys():
             if card.effect["Desctruction"]["Condition"] == "None":
                 if "Lose_HP" in card.effect["Destruction"]["Event"]["Do"].keys():
