@@ -3,6 +3,8 @@ from deck import *
 from board import *
 from bdd import *
 
+from PyQt5.QtGui import QColor
+
 class Player:
     def __init__(self, deck_name : str, board : Board, lines : list, first_line_other_player : int) -> None:
         self.deck = self.create_deck(deck_name)
