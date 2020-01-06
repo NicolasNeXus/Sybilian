@@ -93,12 +93,14 @@ class Game(QWidget):
         for i in range(len(self.board.grid)):
             for j in range(len(self.board.grid[0])):
                 if self.position[i][j].contains(position):
-                    self.players[self.nb_turns%2].play(self.index_current_card, (i, j))
-                    self.nb_actions -= self.board.grid[i][j].price
-                    self.players[self.nb_turns%2].hand.container[self.index_current_card].move(self.position[i][j].x(), self.position[i][j].y())
-                    self.index_current_card = -1
-                    e.setDropAction(Qt.MoveAction)
-                    e.accept() 
+                    # The player actually plays the card
+                    if self.players[self.nb_turns%2].play(self.index_current_card, (i, j)):
+                        self.nb_actions -= self.board.grid[i][j].price
+                        self.players[self.nb_turns%2].hand.container[self.index_current_card].move(self.position[i][j].x(), self.position[i][j].y())
+                        self.index_current_card = -1
+                        e.setDropAction(Qt.MoveAction)
+                        e.accept() 
+
         self.update()
             
     ### GRAPHICS USE ###

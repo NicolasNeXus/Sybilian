@@ -79,8 +79,7 @@ class Player:
         if isinstance(card, Monster) and isinstance(other_card, Monster):
             if card.owner == self.owner:
                 if other_card.owner == self.other_player.owner:
-                    card.life-=1
-                    other_card.life-=1
+                    card.attack(other_card)
                     self.board.clean()
                     self.empty_purgatory()
                     self.other_player.empty_purgatory()    
@@ -118,6 +117,10 @@ class Player:
             print("Impossible d'attaquer directement l'adversaire")
 
     def effect_destruction(self, card : Monster) -> None:
+        """
+            Trigger destruction
+            effect of a card
+        """
         if "Destruction" in card.effect.keys():
             if card.effect["Desctruction"]["Condition"] == "None":
                 if "Lose_HP" in card.effect["Destruction"]["Event"]["Do"].keys():
@@ -169,13 +172,22 @@ class Player:
         print("Cette case ne correspond pas à une case de votre adversaire")
         return False
         
-    def play(self, j : int, coord : tuple = (0,0)) -> None:
+    def play(self, j : int, coord : tuple = (0,0)) -> bool:
         """
             The player plays a card from
             its hand on the board at the
-            position coord
+            position coord. 
+            Return True if the card is
+            actually played
         """
         card_played = self.hand.play(j)
         card_played.coord = coord
+        # The player actually plays the card
         if self.verify_coord(coord):
             self.board.play(card_played, coord)
+        # The player puts his card back into his hand
+        else:
+            self.hand.add(card_played)
+        return self.verify_coord(coord)
+        
+        
