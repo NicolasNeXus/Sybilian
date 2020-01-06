@@ -182,6 +182,12 @@ class Player:
         """
         card_played = self.hand.play(j)
         card_played.coord = coord
+        # The player actually plays the card
         if self.verify_coord(coord):
             self.board.play(card_played, coord)
+        # The player puts his card back into his hand
+        else:
+            self.hand.add(card_played)
+        return self.verify_coord(coord)
+        
         
