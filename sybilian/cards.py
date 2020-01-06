@@ -8,6 +8,7 @@ class Card(QLabel):
         a color and an effect that
         is stored as a dict
     """
+    #def __init__(self, name : str, price : int, color : str, effect : dict, game_text : str, owner : str = None) -> None:
     def __init__(self, name : str, parent, price : int, color : str, effect : dict, game_text : str, owner : str = None) -> None:
         super().__init__(name, parent)
         self.name = name
@@ -36,30 +37,29 @@ class Card(QLabel):
         return printable_content
 
     def mouseMoveEvent(self, e):
-        if not self.placed:
-            if e.buttons() != Qt.LeftButton:
-                return
+        if e.buttons() != Qt.LeftButton:
+            return
     
-            mimeData = QMimeData()
-            drag = QDrag(self)
-            drag.setMimeData(mimeData)
-            drag.setHotSpot(e.pos() - self.rect().topLeft())
-            #dropAction = drag.exec_(Qt.MoveAction)
+        mimeData = QMimeData()
+        drag = QDrag(self)
+        drag.setMimeData(mimeData)
+        drag.setHotSpot(e.pos() - self.rect().topLeft())
+        dropAction = drag.exec_(Qt.MoveAction)
     
     def enterEvent(self, e):  
         self.explanation.move(680, 400)
-        self.explanation.setText(self.name + "\n" + self.game_text)
+        self.explanation.setText(self.name + "\n\n" + self.game_text)
         self.explanation.show()
         
         # invalid cards : they have been already used
-        if self.placed:
-            self.win.setOverrideCursor(Qt.ForbiddenCursor)
+        #if self.placed:
+            #self.win.setOverrideCursor(Qt.ForbiddenCursor)
         
     def leaveEvent(self, e):
         self.explanation.hide()
         
-        if self.placed:
-            self.win.restoreOverrideCursor()
+#        if self.placed:
+#            self.win.restoreOverrideCursor()
 
 class Placeholder(Card):
     """
