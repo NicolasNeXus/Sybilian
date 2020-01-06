@@ -15,7 +15,7 @@ class Game:
         self.board = Board()
         # player_one has access to the first and second lines of the board
         # player_two has access to the third and fourth lines of the board
-        self.players = (Player("draft_bleu.csv", self.board, [0, 1], 2), Player("draft_rouge.csv", self.board, [2, 3], 1))
+        self.players = (Player("deckA005.csv", self.board, [0, 1], 2), Player("deckB001.csv", self.board, [2, 3], 1))
         self.players[0].other_player = self.players[1]
         self.players[1].other_player = self.players[0]
         self.nb_turns = 0
@@ -49,7 +49,7 @@ class Game:
             elif action == 'c':
                 print(self.players[self.nb_turns%2].hand)
             elif action == 'j':
-                j = int(input("Quelle carte voulez-vous jouer (entrer un nombre entre 1 et "+str(self.players[self.nb_turns%2].hand.size) +"): "))
+                j = int(input("Quelle carte voulez-vous jouer (entrer un nombre entre 1 et "+str(self.players[self.nb_turns%2].hand.size()) +"): "))
                 if isinstance(self.players[self.nb_turns%2].hand.read_card(j - 1), Monster):
                     x = int(input("Sur quelle ligne voulez-vous jouer votre carte (" + str(self.players[self.nb_turns%2].lines[0]) +" ou " + str(self.players[self.nb_turns%2].lines[1]) + "): "))
                     y = int(input("Sur quelle colonnes voulez-vous jouer votre carte (0 ou 1 ou 2): "))

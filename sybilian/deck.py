@@ -80,6 +80,15 @@ class Hand():
         for i in range(4):
             self.add(deck.draw())
 
+
+    def size(self) -> int:
+        """
+            Give the size of
+            the hand of the player
+        """
+        return len(self.container)
+
+
     def add(self, card : Monster) -> None:
         """
             add a card to the hand
@@ -116,7 +125,6 @@ class Hand():
         """
             play the j-th card of the hand
         """
-        self.size-=1
         storage = deque([])
         for i in range(j):
             storage.append(self.container.pop())
