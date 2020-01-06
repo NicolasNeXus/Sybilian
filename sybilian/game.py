@@ -24,7 +24,7 @@ class Game(QWidget):
         self.board = Board()
         # player_one has access to the first and second lines of the board
         # player_two has access to the third and fourth lines of the board
-        self.players = (Player("deckA005.csv", self.board, [0, 1], 2), Player("deckB001.csv", self.board, [2, 3], 1))
+        self.players = (Player("deckA005.csv", self.board, [0, 1], 2, self), Player("deckB001.csv", self.board, [2, 3], 1, self))
         self.players[0].other_player = self.players[1]
         self.players[1].other_player = self.players[0]
         self.nb_turns = 0
@@ -32,14 +32,15 @@ class Game(QWidget):
         self.end = False
         self.ongo_attack = False
         
+        
         self.finish_turn = QPushButton('FINISH YOUR TURN', self) # button to finish your turn
         self.setMouseTracking(True) # mouse tracking on the screen
-        self.acceptDrops(True) # drag 'n' drop accepted 
+        self.setAcceptDrops(True)
         self.initUi()
         self.position = [[QRect(150*j + 100, 100 + 150 * i, 50, 100) for j in range(3)] for i in range(2)] + [[QRect(150*j + 100, 400 + 150 * i, 50, 100) for j in range(3)] for i in range(2)]
         self.color = [[QColor(255, 0, 0, 200) for j in range(3)] for i in range(2)] + [[QColor(0, 0, 255, 200) for j in range(3)] for i in range(2)]
         
-    def iniUi(self) -> None:
+    def initUi(self) -> None:
         # event for changing turns 
         def change_turn():
             # mettre fin au tour
@@ -79,17 +80,10 @@ class Game(QWidget):
                 if self.position[i][j].contains(position):
                     self.players[self.nb_turns%2].play(0, (i, j))
                     self.nb_actions -= self.board.grid[i][j].price
-                    self.players[self.nb_turns%2].hand.container[0].move(self.position[i][j].x(), self.position[i][j].y())
+                    self.players[self.nb_turns%2].hand.container[0].move(0,0)#self.position[i][j].x(), self.position[i][j].y())
                     e.setDropAction(Qt.MoveAction)
-                    e.accept()                    
-                                    
-    
-    def game_loop(self):
-        while not self.end:
-            print('EN COURS')
-#            while self.nb_actions > 0:
-#                self.turn()
-            #self.nb_turns += 1
+                    e.accept() 
+        self.update()
             
     ### GRAPHICS USE ###
     
@@ -107,10 +101,11 @@ class Game(QWidget):
                 painter.drawRect(self.position[i][j])
                 painter.fillRect(self.position[i][j], self.color[i][j])
         # display the hand of the current player
-        player = self.players[self.nb_turns%2]
+        player = self.players[self.nb_turns%2] # current player
         for i in range(len(player.hand.container)):
-            Cards 
-            player.hand.container[i].setPixmap()
+            card = player.hand.container[i]  
+            card.setPixmap(QPixmap("monster.png"))
+            card.move(20 + 70*i, 700)
         painter.end()
 
     

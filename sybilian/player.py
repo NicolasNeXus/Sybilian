@@ -6,7 +6,8 @@ from bdd import *
 from PyQt5.QtGui import QColor
 
 class Player:
-    def __init__(self, deck_name : str, board : Board, lines : list, first_line_other_player : int) -> None:
+    def __init__(self, deck_name : str, board : Board, lines : list, first_line_other_player : int, app : QWidget) -> None:
+        self.w = app
         self.deck = self.create_deck(deck_name)
         self.owner = deck_name
         self.life = Life(self.deck)
@@ -17,6 +18,7 @@ class Player:
         self.lines = lines
         self.first_line_other_player = first_line_other_player
         self.other_player = None
+        
 
     def __str__(self):
         """
@@ -66,7 +68,7 @@ class Player:
             according to the name of the
             deck
         """
-        return csv_to_deck(deck_name)
+        return csv_to_deck(deck_name, self.w)
 
     def attack_monster(self, card : Monster, other_card : Monster) -> None:
         """
