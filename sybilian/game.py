@@ -3,7 +3,7 @@
 Created on Fri Nov 29 11:08:41 2019
 
 @author: clari
-and Nicolas
+and @Nicolas
 """
 
 from cards import *
