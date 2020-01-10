@@ -4,7 +4,7 @@ from board import *
 from bdd import *
 
 class Player:
-    def __init__(self, deck_name : str, board : Board, lines : list, first_line_other_player : int) -> None:
+    def __init__(self, deck_name : str, board : Board, lines : list) -> None:
         self.deck = self.create_deck(deck_name)
         self.owner = deck_name
         self.life = Life(self.deck)
@@ -13,7 +13,6 @@ class Player:
         self.grave = Graveyard()
         self.board = board
         self.lines = lines
-        self.first_line_other_player = first_line_other_player
         self.other_player = None
 
     def __str__(self):
@@ -71,12 +70,13 @@ class Player:
             Attack the other Monster
             on the board directly
         """
-        #self.card.attack(other_card) quand on aura implémenter l'effet puissant
+        
         if isinstance(card, Monster) and isinstance(other_card, Monster):
+            print(card.owner)
+            print(other_card.owner)
             if card.owner == self.owner:
                 if other_card.owner == self.other_player.owner:
-                    card.life-=1
-                    other_card.life-=1
+                    card.attack(other_card)
                     self.board.clean()
                     self.empty_purgatory()
                     self.other_player.empty_purgatory()    
@@ -91,9 +91,9 @@ class Player:
             of the opponent is empty
             Return True if it's empty
         """
-        empty = not isinstance(self.board.grid[self.first_line_other_player][0], Monster)
+        empty = not isinstance(self.board.grid[self.other_player.lines[0]][0], Monster)
         for i in range(1, 3):
-            empty = empty and not isinstance(self.board.grid[self.first_line_other_player][i], Monster)
+            empty = empty and not isinstance(self.board.grid[self.other_player.lines[0]][i], Monster)
         return empty
 
     def attack_player_with_monster(self, card : Monster, other_player) -> None:
@@ -133,10 +133,10 @@ class Player:
    
     def effect_destruction(self, card : Monster) -> None:
         if "Destruction" in card.effect.keys():
-            if card.effect["Desctruction"]["Condition"] == "None":
+            if card.effect["Destruction"]["Condition"] == "None":
                 if "Lose_HP" in card.effect["Destruction"]["Event"]["Do"].keys():
-                    for i in range(cards.effect["Desctruction"]["Event"]["Do"]["Lose_HP"]["Amount"]):
-                        if cards.effect["Desctruction"]["Event"]["Do"]["Lose_HP"]["Owner"] == "Player": 
+                    for i in range(card.effect["Destruction"]["Event"]["Do"]["Lose_HP"]["Amount"]):
+                        if card.effect["Destruction"]["Event"]["Do"]["Lose_HP"]["Owner"] == "Player": 
                             self.draw_hp()
                         else:
                             self.other_player.draw_hp()
@@ -166,9 +166,27 @@ class Player:
         for i in range(storage_size):
             self.board.purgatory.add(storage.pop())
         
-    def verify_coord(self, coord : tuple) -> bool:
+    def verify_coord_attack(self, coord : tuple) -> bool:
         """ 
-           Verify that the co-ordinates are valid 
+           Verify that the co-ordinates are valid to attack
+           Return True if they are valid
+        """
+        i, j = coord
+        # The co-ordinates correspond to the lines of the player 
+        if i in self.other_player.lines and j in [0, 1, 2]:
+            # The emplacement is empty
+            if not isinstance(self.board.grid[i][j], Monster):
+                print("Il n'y a pas de monstre sur cette case")
+                return False
+            else:
+                return True
+        print("Cette case ne correspond pas à une case de votre adversaire")
+        return False
+    
+    def verify_coord_play(self, coord : tuple) -> bool:
+        """ 
+           Verify that the co-ordinates are valid to play
+           a card
            Return True if they are valid
         """
         i, j = coord
@@ -178,9 +196,9 @@ class Player:
             if not isinstance(self.board.grid[i][j], Monster):
                 return True
             else:
-                print("Il n'y a pas de monstre sur cette case")
+                print("Il y a déjà un monstre sur cette case")
                 return False
-        print("Cette case ne correspond pas à une case de votre adversaire")
+        print("Cette case ne correspond pas à une de vos cases")
         return False
         
     def play(self, j : int, coord : tuple = (0,0)) -> bool:
@@ -193,10 +211,10 @@ class Player:
         """
         card_played = self.hand.play(j)
         card_played.coord = coord
-        # The card is actually played
-        if self.verify_coord(coord):
+        is_played = self.verify_coord_play(coord)
+        if is_played:
             self.board.play(card_played, coord)
         # We put the card back into the hand
         else:
             self.hand.add(card_played)
-        return self.verify_coord(coord)
+        return is_played
