@@ -54,8 +54,9 @@ class Game:
                 if isinstance(self.players[self.nb_turns%2].hand.read_card(j - 1), Monster):
                     x = int(input("Sur quelle ligne voulez-vous jouer votre carte (" + str(self.players[self.nb_turns%2].lines[0]) +" ou " + str(self.players[self.nb_turns%2].lines[1]) + "): "))
                     y = int(input("Sur quelle colonnes voulez-vous jouer votre carte (0 ou 1 ou 2): "))
-                    self.players[self.nb_turns%2].play(j, (x, y))
-                    nb_actions -= self.board.grid[x][y].price
+                    # The card is actually played
+                    if self.players[self.nb_turns%2].play(j, (x, y)):
+                        nb_actions -= self.board.grid[x][y].price
                 elif isinstance(self.players[self.nb_turns%2].hand.read_card(j - 1), Spell):
                     #voir ensuite comment faire pour les sorts 
                     nb_actions -= self.players[self.nb_turns%2].hand.read_card(j).price
