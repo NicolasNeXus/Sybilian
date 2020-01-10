@@ -133,10 +133,10 @@ class Player:
    
     def effect_destruction(self, card : Monster) -> None:
         if "Destruction" in card.effect.keys():
-            if card.effect["Desctruction"]["Condition"] == "None":
+            if card.effect["Destruction"]["Condition"] == "None":
                 if "Lose_HP" in card.effect["Destruction"]["Event"]["Do"].keys():
-                    for i in range(cards.effect["Desctruction"]["Event"]["Do"]["Lose_HP"]["Amount"]):
-                        if cards.effect["Desctruction"]["Event"]["Do"]["Lose_HP"]["Owner"] == "Player": 
+                    for i in range(cards.effect["Destruction"]["Event"]["Do"]["Lose_HP"]["Amount"]):
+                        if cards.effect["Destruction"]["Event"]["Do"]["Lose_HP"]["Owner"] == "Player": 
                             self.draw_hp()
                         else:
                             self.other_player.draw_hp()
@@ -195,6 +195,17 @@ class Player:
         card_played.coord = coord
         # The card is actually played
         if self.verify_coord(coord):
+            if "Impact" in card_played.effect.keys():
+                impacted = int(input("Voulez-vous utiliser l'effet d'impact ? 1 pour oui, 0 pour non"))
+                if impacted:
+                    if "Target" in card_played.effect["Impact"]["Condition"]["Event"].keys():
+
+                        target_list = []
+                        for i in range(card_played.effect["Impact"]["Condition"]["Event"]["Amount"]):
+                            x_impact = int(input("Ligne du montre qui est visé par l'impact"))
+                            y_impact = int(input("Colonne du monstre qui est visé par l'impact"))
+                            target_list.append(self.board.grid[x_impact][y_impact])
+                effect_impact(card_played, target_list)
             self.board.play(card_played, coord)
         # We put the card back into the hand
         else:

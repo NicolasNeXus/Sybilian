@@ -81,7 +81,6 @@ class Hand():
         for i in range(4):
             self.add(deck.draw())
 
-
     def add(self, card : Monster) -> None:
         """
             add a card to the hand
@@ -119,7 +118,7 @@ class Hand():
         """
             play the j-th card of the hand
         """
-        card_j = self.container.remove(j)
+        card_j = self.container.pop(j)
         self.size-=1
         return card_j
         
