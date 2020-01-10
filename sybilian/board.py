@@ -40,7 +40,7 @@ class Board:
             for j,monster in enumerate(row):
                 if isinstance(monster, Monster) and monster.life<=0:
                     self.purgatory.add(monster)
-                    self.grid[i][j] = Card("void", "-1","","") 
+                    self.grid[i][j] = Placeholder()
 
 
     def play(self, card : Card, coord : tuple) -> None:

@@ -50,13 +50,14 @@ class Game:
             elif action == 'c':
                 print(self.players[self.nb_turns%2].hand)
             elif action == 'j':
-                j = int(input("Quelle carte voulez-vous jouer (entrer un nombre entre 1 et "+str(self.players[self.nb_turns%2].hand.size) +"): "))
+                j = int(input("Quelle carte voulez-vous jouer (entrer un nombre entre 1 et "+ str(self.players[self.nb_turns%2].hand.size) +"): "))
                 if isinstance(self.players[self.nb_turns%2].hand.read_card(j - 1), Monster):
                     x = int(input("Sur quelle ligne voulez-vous jouer votre carte (" + str(self.players[self.nb_turns%2].lines[0]) +" ou " + str(self.players[self.nb_turns%2].lines[1]) + "): "))
                     y = int(input("Sur quelle colonnes voulez-vous jouer votre carte (0 ou 1 ou 2): "))
                     # The card is actually played
                     if self.players[self.nb_turns%2].play(j, (x, y)):
                         nb_actions -= self.board.grid[x][y].price
+                        print("Il vous reste " + str(nb_actions))
                 elif isinstance(self.players[self.nb_turns%2].hand.read_card(j - 1), Spell):
                     #voir ensuite comment faire pour les sorts 
                     nb_actions -= self.players[self.nb_turns%2].hand.read_card(j).price
@@ -64,19 +65,31 @@ class Game:
                     
         # Player are allowed to attack after their first turn
         if self.nb_turns > 1:
+            print("Point de vie: " + str(self.players[self.nb_turns%2].life_points))
+            print("Point de vie: " + str(self.players[1 - self.nb_turns%2].life_points))
             attack = str(input("Entrer 'm' pour attaquer un monstre de l'adversaire, 'a' pour attaquer directement votre adversaire, 'c' pour regarder les cartes dans votre main, 't' pour terminer votre tour"))
             while attack != 't':
                 if attack == 'm':
                     #vérifier que c'est bien le monstre du joueur???
                     x = int(input("Ligne de votre monstre qui attaque: "))
                     y = int(input("Colonne de votre monstre qui attaque: "))
-                    x_other_player = int(input("Ligne du monstre que vous voulez attaquer"))
-                    y_other_player = int(input("Colonne du monstre que vous voulez attaquer"))
-                    self.players[self.nb_turns%2].attack_monster(self.board.grid[x][y], self.board.grid[x_other_player][y_other_player])
+                    x_other_player = int(input("Ligne du monstre que vous voulez attaquer: "))
+                    y_other_player = int(input("Colonne du monstre que vous voulez attaquer: "))
+                    if x in self.players[self.nb_turns%2].lines and y in [0, 1, 2]:
+                        if self.players[self.nb_turns%2].verify_coord_attack((x_other_player, y_other_player)):
+                            self.players[self.nb_turns%2].attack_monster(self.board.grid[x][y], self.board.grid[x_other_player][y_other_player])
+                            attack = str(input("Entrer 'm' pour attaquer un monstre de l'adversaire, 'a' pour attaquer directement votre adversaire, 'c' pour regarder les cartes dans votre main, 't' pour terminer votre tour"))
+                        else :
+                            print("Vous n'attaquez pas un monstre de votre adversaire")
+                    else:
+                        print("Ce n'est pas un de vos monstre que vous voulez faire attaquer")
                 elif attack == 'a':
                     x = int(input("Ligne de votre monstre qui attaque: "))
                     y = int(input("Colonne de votre monstre qui attaque: "))
-                    self.players[self.nb_turns%2].attack_player_with_monster(self.board.grid[x][y], self.players[(self.nb_turns + 1 )%2])
+                    if x in self.players[self.nb_turns%2] and y in [0, 1, 2]:
+                        self.players[self.nb_turns%2].attack_player_with_monster(self.board.grid[x][y], self.players[(self.nb_turns + 1 )%2])
+                    else:
+                        print("Ce n'est pas un de vos monstre que vous voulez faire attaquer")
                 elif action == 'c':
                     print(self.players[self.nb_turns%2].hand)
             attack = str(input("Entrer 'm' pour attaquer un monstre de l'adversaire, 'a' pour attaquer directement votre adversaire, 'c' pour regarder les cartes dans votre main, 't' pour terminer votre tour"))

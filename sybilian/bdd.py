@@ -8,7 +8,7 @@ from json import loads
 from cards import *
 from deck import *
 
-CLIENT = MongoClient('mongodb://TDLOG:sybilian@127.0.0.1/sybiliandb')
+CLIENT = MongoClient('mongodb://TDLOG:sybilian@192.168.99.100/sybiliandb')
 DB = CLIENT.sybiliandb
 COLLECTION = DB.cards
 COULEUR = {"A" : "blue", "B" : "red", "C" : "orange", "D" : "yellow", "E" : "gray", "F" : "green", "G" : "purple" }
@@ -72,7 +72,9 @@ def csv_to_deck(csv_file : str) -> Deck:
     with open(csv_file, newline = '') as csvfile:
         parse = csv.reader(csvfile, delimiter = ",", quotechar = "|")
         for j,row in enumerate(parse):
-            deck.add(pull_card(row[0]))
+            card_pulled = pull_card(row[0])
+            card_pulled.owner = csv_file
+            deck.add(card_pulled)
     return deck
 
 
