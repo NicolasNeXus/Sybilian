@@ -3,11 +3,8 @@ from deck import *
 from board import *
 from bdd import *
 
-from PyQt5.QtGui import QColor
-
 class Player:
-    def __init__(self, deck_name : str, board : Board, lines : list, first_line_other_player : int, app : QWidget) -> None:
-        self.w = app
+    def __init__(self, deck_name : str, board : Board, lines : list, first_line_other_player : int) -> None:
         self.deck = self.create_deck(deck_name)
         self.owner = deck_name
         self.life = Life(self.deck)
@@ -18,7 +15,6 @@ class Player:
         self.lines = lines
         self.first_line_other_player = first_line_other_player
         self.other_player = None
-        
 
     def __str__(self):
         """
@@ -68,7 +64,7 @@ class Player:
             according to the name of the
             deck
         """
-        return csv_to_deck(deck_name, self.w)
+        return csv_to_deck(deck_name)
 
     def attack_monster(self, card : Monster, other_card : Monster) -> None:
         """
@@ -79,7 +75,8 @@ class Player:
         if isinstance(card, Monster) and isinstance(other_card, Monster):
             if card.owner == self.owner:
                 if other_card.owner == self.other_player.owner:
-                    card.attack(other_card)
+                    card.life-=1
+                    other_card.life-=1
                     self.board.clean()
                     self.empty_purgatory()
                     self.other_player.empty_purgatory()    
@@ -117,10 +114,6 @@ class Player:
             print("Impossible d'attaquer directement l'adversaire")
 
     def effect_destruction(self, card : Monster) -> None:
-        """
-            Trigger destruction
-            effect of a card
-        """
         if "Destruction" in card.effect.keys():
             if card.effect["Desctruction"]["Condition"] == "None":
                 if "Lose_HP" in card.effect["Destruction"]["Event"]["Do"].keys():
@@ -172,22 +165,13 @@ class Player:
         print("Cette case ne correspond pas à une case de votre adversaire")
         return False
         
-    def play(self, j : int, coord : tuple = (0,0)) -> bool:
+    def play(self, j : int, coord : tuple = (0,0)) -> None:
         """
             The player plays a card from
             its hand on the board at the
-            position coord. 
-            Return True if the card is
-            actually played
+            position coord
         """
         card_played = self.hand.play(j)
         card_played.coord = coord
-        # The player actually plays the card
         if self.verify_coord(coord):
             self.board.play(card_played, coord)
-        # The player puts his card back into his hand
-        else:
-            self.hand.add(card_played)
-        return self.verify_coord(coord)
-        
-        

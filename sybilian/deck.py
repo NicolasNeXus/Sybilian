@@ -19,7 +19,7 @@ class Deck:
             Draw a card from the deck
             and return the card
         """
-        self.size -= 1
+        self.size-=1
         return self.container.pop()
 
     def add_end(self, card : Card) -> None:
@@ -27,7 +27,7 @@ class Deck:
             Add a card at the end of the deck
         """
         self.container.appendleft(card)
-        self.size += 1
+        self.size+=1
 
     def add(self, card : Card) -> None:
         """
