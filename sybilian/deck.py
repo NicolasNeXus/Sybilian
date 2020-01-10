@@ -77,16 +77,9 @@ class Hand():
         self.deck = deck
         self.life = life
         self.max_len = 10
+        self.size = len(self.container)
         for i in range(4):
             self.add(deck.draw())
-
-
-    def size(self) -> int:
-        """
-            Give the size of
-            the hand of the player
-        """
-        return len(self.container)
 
 
     def add(self, card : Monster) -> None:
@@ -96,6 +89,7 @@ class Hand():
         """
         if len(self.container) < 10:
             self.container.append(card)
+            self.size+=1
 
     def read_card(self, i : int) -> Monster:
         """
@@ -125,12 +119,8 @@ class Hand():
         """
             play the j-th card of the hand
         """
-        storage = deque([])
-        for i in range(j):
-            storage.append(self.container.pop())
-        card_j = self.container.pop()
-        for i in range(j):
-            self.container.append(storage.pop())
+        card_j = self.container.remove(j)
+        self.size-=1
         return card_j
         
     def __str__(self) -> str:

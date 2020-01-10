@@ -47,23 +47,25 @@ class Monster(Card):
         self.life = 2
         self.coord = (0,0)
 
+
     def attack(self, card_2):
         """
             A card can attack an other card
         """
         assert(self.life > 0)
-        if self.effect["Puissante"]==1:
-            if card_2.effect["Puissante"]==1:
+        if "Powerful" in self.effect.keys() and self.effect["Powerful"]=="No_condition":
+            if "Powerful" in card_2.effect.keys() and card_2.effect["Powerful"]=="No_condition":
                 card_2.life-=1
             else:
                 card_2.life = 0
             self.life-=1
         else:
-            if card_2.effect["Puissante"]==1:
+            if "Powerful" in card_2.effect.keys() and card_2.effect["Powerful"]=="No_condition":
                 self.life = 0
             else:
                 self.life-=1
             card_2.life-=1
+
 
 class Spell(Card):
     """
