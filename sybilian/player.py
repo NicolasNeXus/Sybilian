@@ -113,6 +113,24 @@ class Player:
         else:
             print("Impossible d'attaquer directement l'adversaire")
 
+    def effect_impact(self, card : Monster, targets : list = [Placeholder()]) -> None:
+        """
+            Trigger impact
+            effect of a card
+            it takes an optionnal
+            target
+        """
+        if "Impact" in card.effect.keys():
+            if cards.effect["Impact"]["Condition"] == "None":
+                if "Damage" in card.effect["Impact"]["Condition"]["Event"]["Do"]:
+                    if "Target" == card.effect["Impact"]["Condition"]["Event"]["Do"]["Damage"]and isinstance(Target, Monster):
+                        if card.effect["Impact"]["Condition"]["Event"]["Target"]["Owner"] == "Both":
+                            for i in range(min(card.effect["Impact"]["Condition"]["Event"]["Amount"], len(targets))):
+                                card_targeted = targets[i]
+                                if card.effect["Impact"]["Condition"]["Event"]["Attribute"] == "Undamaged" and card_targeted.life == 2:
+                                	 card_targeted.life-=1 #works because it's a reference
+                                       # no need to return a card
+   
     def effect_destruction(self, card : Monster) -> None:
         if "Destruction" in card.effect.keys():
             if card.effect["Desctruction"]["Condition"] == "None":
