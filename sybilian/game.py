@@ -19,7 +19,7 @@ from PyQt5.QtGui import QPainter, QColor, QPixmap, QDrag, QPen, QCursor
 import sys
 
 class Game(QWidget):
-    def __init__(self) -> None:
+    def __init__(self, app : QApplication) -> None:
         super().__init__()
         self.board = Board()
         # player_one has access to the first and second lines of the board
@@ -39,8 +39,24 @@ class Game(QWidget):
         self.initUi()
         self.position = [[QRect(150*j + 100, 100 + 150 * i, 50, 100) for j in range(3)] for i in range(2)] + [[QRect(150*j + 100, 400 + 150 * i, 50, 100) for j in range(3)] for i in range(2)]
         self.color = [[QColor(255, 0, 0, 200) for j in range(3)] for i in range(2)] + [[QColor(0, 0, 255, 200) for j in range(3)] for i in range(2)]
+        self.grid = [[Placeholder for j in range(3)] for i in range(2)] + [[Placeholder for j in range(3)] for i in range(2)]
+        self.name_player = [["Joueur1" for j in range(3)]for i in range(2)] + [["Joueur2" for j in range(3)]for i in range(2)]
         self.initHand()
+        self.initLife()
         self.index_current_card = -1
+        self.qapp = app
+        self.player_medal = [QRect(0, 0, 100, 50), QRect(0, 850, 100, 50)]
+        self.color_players = [QColor(255, 0, 0, 200), QColor(0, 0, 255, 200)]
+    
+    def initLife(self) -> None:
+        # display life points for the 2 players
+        for i in range(2):
+            player = self.players[i]
+            for j in range(player.life.size):
+                card = player.life.container[j]  
+                card.setPixmap(QPixmap("hidden_card.png"))
+                card.move(550, 300*i + 100 + 25*j)
+                card.show()
     
     def initHand(self) -> None:
         # display the hand of the current player
@@ -49,6 +65,23 @@ class Game(QWidget):
             card = player.hand.container[i]  
             card.setPixmap(QPixmap("monster.png"))
             card.move(20 + 70*i, 700)
+            card.show()
+    
+    def clearHand(self) -> None:
+        # erase (graphically) the hand of the current player
+        player = self.players[self.nb_turns%2] # current player
+        print("Main", len(player.hand.container))
+        for i in range(len(player.hand.container)):
+            card = player.hand.container[i]  
+            card.hide()
+            
+    def clearLife(self) -> None:
+        # erase (graphically) the life of the current player
+        for i in range(2):
+            player = self.players[i]
+            for j in range(player.life.size):
+                card = player.life.container[j]  
+                card.hide()
     
     def initUi(self) -> None:
         # event for changing turns 
@@ -56,9 +89,14 @@ class Game(QWidget):
             # mettre fin au tour
             self.nb_actions = 2
             self.ongo_attack = False
+            self.clearHand()
+            self.clearLife()
+            self.end = self.condition_endgame() # mise a jour de la condition end
+            self.players[self.nb_turns%2].draw_hp()
             self.nb_turns += 1
-            self.end = self.condition_endgame()
             self.initHand()
+            self.initLife()
+            
         
         self.finish_turn.move(700, 300)
         self.finish_turn.clicked.connect(change_turn)
@@ -80,27 +118,37 @@ class Game(QWidget):
             print("Le joueur 1 a gagné!")
             return True
 
+    # est-ce qu'on a le droit de prendre cette carte dans la main ?
+    def back_take_card_from_hand(self, player : str, index_card : int) -> bool:
+        return(True)
+
     def dragEnterEvent(self, e):
-        e.accept()
         for i in range(len(self.players[self.nb_turns%2].hand.container)):
             card = self.players[self.nb_turns%2].hand.container[i]
             if QRect(card.x(), card.y(), card.width, card.height).contains(e.pos()):
                 self.index_current_card = i
+        if self.back_take_card_from_hand(self.hand[], self.index_current_card):
+            e.accept()
               
-    # to play cards on the board (drag'n'drop)
+    def move_card_from_hand_to_board(self, index_current_card : int, position : tuple) -> None:
+        self.players[self.nb_turns%2].hand.container[self.index_current_card].move(self.position[position[0]][position[1]].x(), self.position[position[0]][position[1]].y())
+        self.index_current_card = -1
+
+    # est-ce que j'ai le droit de jouer cette carte de ma main ?
+    def back_play_card_from_hand(self, player : str, index_card : int, card : Card, pos : tuple) -> bool:
+        return(True)
+
+    # to play cards on the board (drag'n'drop) --> Jouer des cartes sur le plateau
     def dropEvent(self, e):
         position = e.pos()
         for i in range(len(self.board.grid)):
             for j in range(len(self.board.grid[0])):
                 if self.position[i][j].contains(position):
-                    # The player actually plays the card
-                    if self.players[self.nb_turns%2].play(self.index_current_card, (i, j)):
-                        self.nb_actions -= self.board.grid[i][j].price
-                        self.players[self.nb_turns%2].hand.container[self.index_current_card].move(self.position[i][j].x(), self.position[i][j].y())
-                        self.index_current_card = -1
+                    pos = (i, j)
+                    if self.back_play_card_from_hand(self.name_player[self.index_current_card], self.index_current_card) :
+                        self.move_card_from_hand_to_board(self.players[self.nb_turns%2], self.index_current_card, pos)
                         e.setDropAction(Qt.MoveAction)
                         e.accept() 
-
         self.update()
             
     ### GRAPHICS USE ###
@@ -118,38 +166,60 @@ class Game(QWidget):
                 painter.setPen(pen)
                 painter.drawRect(self.position[i][j])
                 painter.fillRect(self.position[i][j], self.color[i][j])
+        
+        # dessiner les joueurs
+        for i in range(len(self.player_medal)):
+            painter.fillRect(self.player_medal[i], self.color_players[i])
         painter.end()
 
+    # possibilité d'attaquer via la position sur la grille
+    def back_card_that_attack(self, pos : tuple) -> bool: 
+        return(True)
     
-    # attack of a monster
+    def back_monster_could_be_attacked(self, pos_board : tuple, pos : tuple) -> bool:
+        return(True)
+        
+    def back_player_could_be_attacked(self, pos_board : tuple, player : str) -> bool:
+        return(True)
+
+    # attack of a monster --> Attaquer monstres ou joueurs
     def mouseReleaseEvent(self, e):
-        x = -1
-        y = -1
-        x_other_player = -1
-        y_other_player = -1
+        x, y = -1, -1
+        x_att, y_att = -1, -1
         position = e.pos()
-        if self.nb_turns > 1:
-            for i in range(len(self.board.grid)):
-                for j in range(len(self.board.grid[0])):
+        attack_instance = None
+        attacked_instance = None
+        if self.nb_turns > 1: # pas le premier tour pour qu'on puisse attaquer
+            # Y-a-til un clic sur le Board ?
+            for i in range(len(self.grid)):
+                for j in range(len(self.grid[0])):
                     if self.position[i][j].contains(position):
-                        if not self.ongo_attack:
-                            x = i
-                            y = j
-                            self.ongo_attack = True
-                            self.color[i][j].setAlpha(50)
-                            app.setOverrideCursor(Qt.CrossCursor)
-                        else:
-                            x_other_player = i
-                            y_other_player = j
-                            self.color[i][j] = QColor(105, 105, 105, 200)
-                            self.players[self.nb_turns%2].attack_monster(self.board.grid[x][y], self.board.grid[x_other_player][y_other_player])
+                        if not self.ongo_attack: # pas encore d'attaque
+                            x, y = i, j
+                            if self.back_card_that_attack((x, y)):
+                                self.ongo_attack = True
+                                self.color[i][j].setAlpha(50)
+                                self.qapp.setOverrideCursor(Qt.CrossCursor) # curseur cible
+                        else: # attaque en cours
+                            x_att, y_att = i, j # coord de la carte attaquée
+                            if self.back_monster_could_be_attacked((x, y), (x_att, y_att)): # monstre peut être attaqué ?                       
+                                self.color[i][j] = QColor(105, 105, 105, 200)
+                            self.players[self.nb_turns%2].attack_monster(self.grid[x][y], self.grid[x_other_player][y_other_player])
                             self.ongo_attack = False
-                            if self.board.grid[x_other_player][y_other_player].life > 0:
+                            
+                            if self.grid[x_other_player][y_other_player].life > 0:
                                 self.color[i][j] = QColor(105, 105, 105, 200)
                             else:
                                 if self.nb_turns%2 == 0:
                                     self.color[i][j] = QColor(0, 0, 255, 200)
                                 else:
                                     self.color[i][j] = QColor(255, 0, 0, 200)
-                            app.restoreOverrideCursor()
+                            self.qapp.restoreOverrideCursor()
+        
+            # Y-a-t-il un clic sur un Player ?
+            for i in range(len(self.player_medal)):
+                if self.player_medal[i].contains(position):
+                    if self.ongo_attack: # attaque en cours
+                        if self.back_player_could_be_attacked(self.player_medal[i]): # joueur peut être attaqué ?
+                            attack_player()
         self.update()          
