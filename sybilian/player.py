@@ -37,7 +37,7 @@ class Player:
             else:
                 self.grave.add(self.deck.draw())
         else:
-            print("Il n'y a plus de cartes dans la pioche")
+            self.draw_hp()
  
     def draw_hp(self) -> None:
         """
@@ -56,7 +56,6 @@ class Player:
             else:
                 self.grave.add(self.life.draw())
 
-
     def create_deck(self, deck_name : str):
         """
             Create the deck of the player
@@ -70,18 +69,10 @@ class Player:
             Attack the other Monster
             on the board directly
         """
-        
-        if isinstance(card, Monster) and isinstance(other_card, Monster):
-            if card.owner == self.owner:
-                if other_card.owner == self.other_player.owner:
-                    card.attack(other_card)
-                    self.board.clean()
-                    self.empty_purgatory()
-                    self.other_player.empty_purgatory()    
-                else:
-                    print("Le monstre que vous voulez attaquer n'est pas un monstre de l'adversaire")
-            else:
-                print("Le monstre qui doit attaquer n'est pas un de vos monstres")
+        card.attack(other_card)
+        self.board.clean()
+        self.empty_purgatory()
+        self.other_player.empty_purgatory()    
     
     def verify_first_line_opponent_empty(self) -> bool:
         """ 
@@ -101,21 +92,11 @@ class Player:
             /!\ must verify that
             attack can't be countered
         """
-        if isinstance(card, Monster) and card.owner == self.owner:
-            if other_player == self.other_player:
-                # Verify that the first line of the opponent is empty
-                if self.verify_first_line_opponent_empty():
-                    other_player.draw_hp()
-                    print("the hp is drawn")
-                    card.life-=1
-                    self.board.clean()
-                    self.empty_purgatory()
-                else:
-                    print("Impossible d'attaquer directement l'adversaire")
-            else:
-                print("Impossible de s'attaquer soi-même")
-        else:
-            print("Le monstre que vous voulez faire attaquer n'est pas le votre")
+        other_player.draw_hp()
+        print("the hp is drawn")
+        card.life-=1
+        self.board.clean()
+        self.empty_purgatory()
 
     def effect_impact(self, card : Monster, targets : list = [Placeholder()]) -> None:
         """
@@ -170,55 +151,13 @@ class Player:
         for i in range(storage_size):
             self.board.purgatory.add(storage.pop())
         
-    def verify_coord_attack(self, coord : tuple) -> bool:
-        """ 
-           Verify that the co-ordinates are valid to attack
-           Return True if they are valid
-        """
-        i, j = coord
-        # The co-ordinates correspond to the lines of the player 
-        if i in self.other_player.lines and j in [0, 1, 2]:
-            # The emplacement is empty
-            if not isinstance(self.board.grid[i][j], Monster):
-                print("Il n'y a pas de monstre sur cette case")
-                return False
-            else:
-                return True
-        print("Cette case ne correspond pas à une case de votre adversaire")
-        return False
-    
-    def verify_coord_play(self, coord : tuple) -> bool:
-        """ 
-           Verify that the co-ordinates are valid to play
-           a card
-           Return True if they are valid
-        """
-        i, j = coord
-        # The co-ordinates correspond to the lines of the player
-        if i in self.lines and j in [0, 1, 2]:
-            # The emplacement is empty
-            if not isinstance(self.board.grid[i][j], Monster):
-                return True
-            else:
-                print("Il y a déjà un monstre sur cette case")
-                return False
-        print("Cette case ne correspond pas à une de vos cases")
-        return False
-        
-    def play(self, j : int, coord : tuple = (0,0)) -> bool:
+    def play(self, j : int, coord : tuple = (0,0)) -> None:
         """
             The player plays a card from
             its hand on the board at the
             position coord
-            Return True if the card is
-            actually played
         """
         card_played = self.hand.play(j)
         card_played.coord = coord
-        is_played = self.verify_coord_play(coord)
-        if is_played:
-            self.board.play(card_played, coord)
-        # We put the card back into the hand
-        else:
-            self.hand.add(card_played)
-        return is_played
+        self.board.play(card_played, coord)
+

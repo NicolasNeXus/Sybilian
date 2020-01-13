@@ -87,7 +87,7 @@ class Hand():
             add a card to the hand
             container
         """
-        if len(self.container) < 10:
+        if len(self.container) < self.max_len:
             self.container.append(card)
             self.size+=1
 
