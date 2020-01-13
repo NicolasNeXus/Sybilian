@@ -72,8 +72,6 @@ class Player:
         """
         
         if isinstance(card, Monster) and isinstance(other_card, Monster):
-            print(card.owner)
-            print(other_card.owner)
             if card.owner == self.owner:
                 if other_card.owner == self.other_player.owner:
                     card.attack(other_card)
@@ -103,15 +101,21 @@ class Player:
             /!\ must verify that
             attack can't be countered
         """
-        # Verify that the first line of the opponent is empty
-        if self.verify_first_line_opponent_empty():
-            other_player.draw_hp()
-            print("the hp is drawn")
-            card.life-=1
-            self.board.clean()
-            self.empty_purgatory()
+        if isinstance(card, Monster) and card.owner == self.owner:
+            if other_player == self.other_player:
+                # Verify that the first line of the opponent is empty
+                if self.verify_first_line_opponent_empty():
+                    other_player.draw_hp()
+                    print("the hp is drawn")
+                    card.life-=1
+                    self.board.clean()
+                    self.empty_purgatory()
+                else:
+                    print("Impossible d'attaquer directement l'adversaire")
+            else:
+                print("Impossible de s'attaquer soi-même")
         else:
-            print("Impossible d'attaquer directement l'adversaire")
+            print("Le monstre que vous voulez faire attaquer n'est pas le votre")
 
     def effect_impact(self, card : Monster, targets : list = [Placeholder()]) -> None:
         """
