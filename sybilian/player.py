@@ -116,7 +116,13 @@ class Player:
                                 	 card_targeted.life-=1 #works because it's a reference
                                        # no need to return a card
    
-    def effect_destruction(self, card : Monster) -> None:
+    def effect_destruction(self, card : Monster, targets : list = [Placeholder()]) -> None:
+        """
+            Trigger the desctruction
+            effect or a card.
+            it takes an optionnal
+            target
+        """
         if "Destruction" in card.effect.keys():
             if card.effect["Destruction"]["Condition"] == "None":
                 if "Lose_HP" in card.effect["Destruction"]["Event"]["Do"].keys():
@@ -125,6 +131,29 @@ class Player:
                             self.draw_hp()
                         else:
                             self.other_player.draw_hp()
+
+
+    def effect_spell(self, card : Spell) -> None :
+        """
+            Trigger the effect
+            of a spell
+        """
+        if "Spell" in card.effect.keys():
+            if card.effect["Spell_effect"]["Condition"] == "None":
+                print("No condition")
+            else:
+                if "Heal" in card.effect["Spell_effect"]["Event"]["Do"].keys():
+                    target = card.effect["Spell_effect"]["Event"]["Target"]
+                    if target["Amount"] == "All" and target["Attribute"] == "Creatures":
+                        if target["Owner"] = "Both":
+                            for i in range(len(self.board)):
+                                for j in range(len(self.board[0])):
+                                    card_targeted = self.board[i][j]
+                                    if isinstance(card_targeted, Monster):
+                                        card_targeted.life = 2
+
+
+
 
 
     def empty_purgatory(self) -> None:
@@ -158,6 +187,17 @@ class Player:
             position coord
         """
         card_played = self.hand.play(j)
-        card_played.coord = coord
-        self.board.play(card_played, coord)
-
+        if isinstance(card_played, Monster):
+            if "Impact" in card_played.effect.keys():
+                impacted = int(input("Voulez-vous utiliser l'effet d'impact ? 1 pour oui, 0 pour non"))
+                if impacted:
+                    if "Target" in card_played.effect["Impact"]["Condition"]["Event"].keys():
+                        target_list = []
+                        for i in range(card_played.effect["Impact"]["Condition"]["Event"]["Amount"]):
+                            x_impact = int(input("Ligne du montre qui est visé par l'impact"))
+                            y_impact = int(input("Colonne du monstre qui est visé par l'impact"))
+                            target_list.append(self.board.grid[x_impact][y_impact])
+                effect_impact(card_played, target_list)
+            self.board.play(card_played, coord)
+        if isinstance(card_played, Spell):
+            self.effect_spell(card_played)

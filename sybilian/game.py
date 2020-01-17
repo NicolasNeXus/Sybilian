@@ -19,7 +19,7 @@ class Game:
         self.board = Board()
         # player_one has access to the first and second lines of the board
         # player_two has access to the third and fourth lines of the board
-        self.players = (Player("deckA005.csv", self.board, [1, 0]), Player("deckB001.csv", self.board, [2, 3]))
+        self.players = (Player("deckC001.csv", self.board, [0, 1], 2), Player("deckB001.csv", self.board, [2, 3], 1))
         self.players[0].other_player = self.players[1]
         self.players[1].other_player = self.players[0]
         self.index = 0 
@@ -40,7 +40,7 @@ class Game:
             print("Le joueur " + str(self.players[1].owner) + " a gagné!")
             return True
     
-    def can_play_card(self, name_player : str, index_card : int, coord : tuple) -> bool:
+    def can_play_monster(self, name_player : str, index_card : int, coord : tuple) -> bool:
         """
             return True if the player playing can play the card 
             return False otherwise  
@@ -49,18 +49,18 @@ class Game:
             coord : position where we want to put the card
         """
         player_playing = self.players[self.index]
-        # The owner's card that wants to play is the player who is playing
-        if name_player == player_playing.owner:
+        # The owner's card that wants to play is the player who is playing and
+        # the card is a monster
+        if name_player == player_playing.owner and isinstance(player_playing.hand.read_card(index_card), Monster):
             # The player still have actions left 
             if self.nb_actions > 0:
                 # The coordinates are valid 
                 if coord[0] in player_playing.lines and coord[1] in [0, 1, 2]:
                         # The spot is empty
-                        if not isinstance(self.board.get_monster(coord), Monster):
+                        if isinstance(self.board.get_monster(coord), Placeholder):
                             player_playing.play(index_card, coord)
                             self.nb_actions -=1
                             return True
-
         return False
     
     def can_draw_card(self, name_player : str):

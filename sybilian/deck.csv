@@ -1,1 +1,0 @@
-{"Type":"Creature","Kin":"Dragon","Powerful":"No_condition","Destruction":{"Condition":"None","Event":{"Do":{"Lose_HP":{"Owner":"Player","Amount":1}}}}}

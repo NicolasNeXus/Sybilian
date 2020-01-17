@@ -81,7 +81,6 @@ class Hand():
         for i in range(4):
             self.add(deck.draw())
 
-
     def add(self, card : Monster) -> None:
         """
             add a card to the hand
