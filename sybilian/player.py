@@ -70,7 +70,7 @@ class Player:
             else:
                 self.grave.add(self.life.draw())
 
-    @
+
     def create_deck(self, deck_name: str):
         """
             Create the deck of the player
