@@ -2,6 +2,7 @@ from cards import *
 from deck import *
 from board import *
 from bdd import *
+import random
 
 class Player:
     def __init__(self, deck_name : str, board : Board, lines : list) -> None:
@@ -106,14 +107,14 @@ class Player:
             target
         """
         if "Impact" in card.effect.keys():
-            if cards.effect["Impact"]["Condition"] == "None":
-                if "Damage" in card.effect["Impact"]["Condition"]["Event"]["Do"]:
-                    if "Target" == card.effect["Impact"]["Condition"]["Event"]["Do"]["Damage"]and isinstance(Target, Monster):
-                        if card.effect["Impact"]["Condition"]["Event"]["Target"]["Owner"] == "Both":
-                            for i in range(min(card.effect["Impact"]["Condition"]["Event"]["Amount"], len(targets))):
+            if card.effect["Impact"]["Condition"] == "None":
+                if "Damage" in card.effect["Impact"]["Event"]["Do"]:
+                    if "Target" == card.effect["Impact"]["Event"]["Do"]["Damage"] and all(list(map(lambda card : isinstance(card, Monster), targets))):
+                        if card.effect["Impact"]["Event"]["Target"]["Owner"] == "Both":
+                            for i in range(min(card.effect["Impact"]["Event"]["Target"]["Amount"], len(targets))):
                                 card_targeted = targets[i]
-                                if card.effect["Impact"]["Condition"]["Event"]["Attribute"] == "Undamaged" and card_targeted.life == 2:
-                                	 card_targeted.life-=1 #works because it's a reference
+                                if card.effect["Impact"]["Event"]["Target"]["Attribute"] == "Undamaged" and card_targeted.life == 2:
+                                	 card_targeted.life -= 1 #works because it's a reference
                                        # no need to return a card
    
     def effect_destruction(self, card : Monster, targets : list = [Placeholder()]) -> None:
@@ -145,7 +146,7 @@ class Player:
                 if "Heal" in card.effect["Spell_effect"]["Event"]["Do"].keys():
                     target = card.effect["Spell_effect"]["Event"]["Target"]
                     if target["Amount"] == "All" and target["Attribute"] == "Creatures":
-                        if target["Owner"] = "Both":
+                        if target["Owner"] == "Both":
                             for i in range(len(self.board)):
                                 for j in range(len(self.board[0])):
                                     card_targeted = self.board[i][j]
@@ -179,7 +180,19 @@ class Player:
                 storage.append(card_purgatory)
         for i in range(storage_size):
             self.board.purgatory.add(storage.pop())
-        
+    
+    def my_undamaged_monsters(self) -> list:
+        """
+            Return a list containing the undamaged monsters of the player
+        """
+        monsters = []
+        for line in self.lines:
+            for col in [0, 1, 2]:
+                if isinstance(self.board.get_monster((line, col)), Monster):
+                    if self.board.get_monster((line, col)).life == 2:
+                        monsters.append(self.board.get_monster((line, col)))
+    return monsters
+                  
     def play(self, j : int, coord : tuple = (0,0)) -> None:
         """
             The player plays a card from
@@ -189,15 +202,13 @@ class Player:
         card_played = self.hand.play(j)
         if isinstance(card_played, Monster):
             if "Impact" in card_played.effect.keys():
-                impacted = int(input("Voulez-vous utiliser l'effet d'impact ? 1 pour oui, 0 pour non"))
-                if impacted:
-                    if "Target" in card_played.effect["Impact"]["Condition"]["Event"].keys():
-                        target_list = []
-                        for i in range(card_played.effect["Impact"]["Condition"]["Event"]["Amount"]):
-                            x_impact = int(input("Ligne du montre qui est visé par l'impact"))
-                            y_impact = int(input("Colonne du monstre qui est visé par l'impact"))
-                            target_list.append(self.board.grid[x_impact][y_impact])
-                effect_impact(card_played, target_list)
+                target_list = self.other_player.my_undamaged_monsters()
+                random.shuffle(target_list)
+                if "Target" in card_played.effect["Impact"]["Condition"]["Event"].keys() :
+                    max_target = card_played.effect["Impact"]["Condition"]["Event"]["Amount"]
+                    self.effect_impact(card_played, target_list[:min(len(target_list), max_target)])
+                else:
+                    self.effect_impact(card_played)
             self.board.play(card_played, coord)
         if isinstance(card_played, Spell):
             self.effect_spell(card_played)
