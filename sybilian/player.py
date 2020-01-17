@@ -231,6 +231,9 @@ class Player:
                         card_played, target_list[:min(len(target_list), max_target)])
                 else:
                     self.effect_impact(card_played)
+                self.board.clean()
+                self.empty_purgatory()
+                self.other_player.empty_purgatory()
             self.board.play(card_played, coord)
         if isinstance(card_played, Spell):
             self.effect_spell(card_played)

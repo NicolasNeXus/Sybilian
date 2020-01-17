@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Fri Nov 29 11:08:41 2019
 
@@ -22,10 +21,10 @@ class Game:
         self.players = (Player("deckC001.csv", self.board, [1, 0]), Player("deckB001.csv", self.board, [2, 3]))
         self.players[0].other_player = self.players[1]
         self.players[1].other_player = self.players[0]
-        self.index = 0 
+        self.index = 0
         self.nb_actions = 2
         self.end = False
-    
+
     def condition_endgame(self) -> bool:
         """
             return True if a player won,
@@ -39,11 +38,11 @@ class Game:
         elif self.players[1].life_points == 0:
             print("Le joueur " + str(self.players[1].owner) + " a gagné!")
             return True
-    
+
     def can_play_monster(self, name_player : str, index_card : int, coord : tuple) -> bool:
         """
-            return True if the player playing can play the card 
-            return False otherwise  
+            return True if the player playing can play the card
+            return False otherwise
             name_player : name of the owner of the card that we want to play
             index_card : index of the card that we want to play
             coord : position where we want to put the card
@@ -52,9 +51,9 @@ class Game:
         # The owner's card that wants to play is the player who is playing and
         # the card is a monster
         if name_player == player_playing.owner and isinstance(player_playing.hand.read_card(index_card), Monster):
-            # The player still have actions left 
+            # The player still have actions left
             if self.nb_actions > 0:
-                # The coordinates are valid 
+                # The coordinates are valid
                 if coord[0] in player_playing.lines and coord[1] in [0, 1, 2]:
                         # The spot is empty
                         if isinstance(self.board.get_monster(coord), Placeholder):
@@ -62,11 +61,11 @@ class Game:
                             self.nb_actions -=1
                             return True # Refresh the hand and the board
         return False
-    
+
     def can_play_spell(self, name_player : str, index_card : int, coord) -> bool:
         """
-            return True if the player playing can play the card 
-            return False otherwise  
+            return True if the player playing can play the card
+            return False otherwise
             name_player : name of the owner of the card that we want to play
             index_card : index of the card that we want to play
         """
@@ -77,7 +76,7 @@ class Game:
             player_playing.play(index_card)
             return True # Refresh the hand and the board
         return False
-    
+
     def can_draw_card(self, name_player : str):
         """
             return True if the player playing can draw a card from his deck
@@ -102,7 +101,7 @@ class Game:
                         self.nb_actions -= 1
                         return (True, ["Deck", "Graveyard"])
         return False
-    
+
     def can_draw_hp(self, name_player : str):
         """
             return True if the player playing can draw a card from his hp
@@ -127,7 +126,7 @@ class Game:
                         self.nb_actions -= 1
                         return (True, ["Life", "Graveyard"])
         return False
-    
+
     def can_attack_monster(self, name_player1 : str, coord1 : tuple, name_player2 : str, coord2 : tuple) -> bool:
         """
             Return True if the player can attack an opponent's monster with his
@@ -148,7 +147,7 @@ class Game:
                     player_playing.attack_monster(self.board.get_monster(coord1), self.board.get_monster(coord2))
                     return True # ici il faut tout mettre à jour!!!!!
         return False
-    
+
     def can_attack_opponent_with_monster(self, name_player1 : str, coord1 : tuple, name_player2 : str):
         """
             Return True if the player can attack his opponent with his monster
@@ -171,13 +170,13 @@ class Game:
         return False
 
     def end_turn(self):
-        """ 
+        """
             Updates the index of the player currently playing and the number
             of actions
         """
         self.index = (self.index + 1)%2
         self.nb_actions = 2
-        
+
     def turn(self):
         """
             /!\ pour l'instant un joueur peut juste jouer des monstres
@@ -200,9 +199,9 @@ class Game:
                     if self.players[self.nb_turns%2].play(j, (x, y)):
                         nb_actions -= self.board.grid[x][y].price
                 elif isinstance(self.players[self.nb_turns%2].hand.read_card(j - 1), Spell):
-                    #voir ensuite comment faire pour les sorts 
+                    #voir ensuite comment faire pour les sorts
                     nb_actions -= self.players[self.nb_turns%2].hand.read_card(j).price
-                    self.board.purgatory.add(self.players[self.nb_turns%2].hand.play(j)) 
+                    self.board.purgatory.add(self.players[self.nb_turns%2].hand.play(j))
             print("Il vous reste " + str(nb_actions))
         # Player are allowed to attack after their first turn
         if self.nb_turns > 1:
@@ -235,10 +234,9 @@ class Game:
                     print(self.players[self.nb_turns%2].hand)
             attack = str(input("Entrer 'm' pour attaquer un monstre de l'adversaire, 'a' pour attaquer directement votre adversaire, 'c' pour regarder les cartes dans votre main, 't' pour terminer votre tour: "))
             print(self.board)
-    
+
     def game_loop(self):
         while not self.end:
             self.turn()
             self.nb_turns += 1
             self.end = self.condition_endgame()
-            
