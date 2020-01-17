@@ -191,7 +191,7 @@ class Player:
                 if isinstance(self.board.get_monster((line, col)), Monster):
                     if self.board.get_monster((line, col)).life == 2:
                         monsters.append(self.board.get_monster((line, col)))
-    return monsters
+        return monsters
                   
     def play(self, j : int, coord : tuple = (0,0)) -> None:
         """
@@ -204,8 +204,8 @@ class Player:
             if "Impact" in card_played.effect.keys():
                 target_list = self.other_player.my_undamaged_monsters()
                 random.shuffle(target_list)
-                if "Target" in card_played.effect["Impact"]["Condition"]["Event"].keys() :
-                    max_target = card_played.effect["Impact"]["Condition"]["Event"]["Amount"]
+                if "Target" in card_played.effect["Impact"]["Event"].keys() :
+                    max_target = card_played.effect["Impact"]["Event"]["Target"]["Amount"]
                     self.effect_impact(card_played, target_list[:min(len(target_list), max_target)])
                 else:
                     self.effect_impact(card_played)
