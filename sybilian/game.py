@@ -19,7 +19,7 @@ class Game:
         self.board = Board()
         # player_one has access to the first and second lines of the board
         # player_two has access to the third and fourth lines of the board
-        self.players = (Player("deckC001.csv", self.board, [0, 1], 2), Player("deckB001.csv", self.board, [2, 3], 1))
+        self.players = (Player("deckC001.csv", self.board, [1, 0]), Player("deckB001.csv", self.board, [2, 3]))
         self.players[0].other_player = self.players[1]
         self.players[1].other_player = self.players[0]
         self.index = 0 
@@ -60,7 +60,22 @@ class Game:
                         if isinstance(self.board.get_monster(coord), Placeholder):
                             player_playing.play(index_card, coord)
                             self.nb_actions -=1
-                            return True
+                            return True # Refresh the hand and the board
+        return False
+    
+    def can_play_spell(self, name_player : str, index_card : int, coord) -> bool:
+        """
+            return True if the player playing can play the card 
+            return False otherwise  
+            name_player : name of the owner of the card that we want to play
+            index_card : index of the card that we want to play
+        """
+        player_playing = self.players[self.index]
+        # The owner's card that wants to play is the player who is playing and
+        # the card is a spell
+        if name_player == player_playing.owner and isinstance(player_playing.hand.read_card(index_card), Spell):
+            player_playing.play(index_card)
+            return True # Refresh the hand and the board
         return False
     
     def can_draw_card(self, name_player : str):
