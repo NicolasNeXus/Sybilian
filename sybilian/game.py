@@ -58,7 +58,7 @@ class Game:
                         # The spot is empty
                         if isinstance(self.board.get_monster(coord), Placeholder):
                             player_playing.play(index_card, coord)
-                            self.nb_actions -=1
+                            self.nb_actions -= 1
                             return True # Refresh the hand and the board
         return False
 
@@ -100,7 +100,7 @@ class Game:
                         player_playing.grave.add(player_playing.deck.draw())
                         self.nb_actions -= 1
                         return (True, ["Deck", "Graveyard"])
-        return False
+        return (False, [])
 
     def can_draw_hp(self, name_player : str):
         """
@@ -125,7 +125,7 @@ class Game:
                         player_playing.grave.add(player_playing.life.draw())
                         self.nb_actions -= 1
                         return (True, ["Life", "Graveyard"])
-        return False
+        return (False, [])
 
     def can_attack_monster(self, name_player1 : str, coord1 : tuple, name_player2 : str, coord2 : tuple) -> bool:
         """

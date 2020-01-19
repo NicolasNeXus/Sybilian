@@ -107,7 +107,7 @@ class Player:
             )
         return empty
 
-    def attack_player_with_monster(self, card: Monster, other_player: Player) -> None:
+    def attack_player_with_monster(self, card: Monster, other_player) -> None:
         """
             Attack the other player
             directly.
@@ -187,8 +187,8 @@ class Player:
         storage_size = 0
         for _ in range(self.board.purgatory.size):
             card_purgatory = self.board.purgatory.draw()
-            print(card_purgatory.owner)
-            print(self.owner)
+#            print(card_purgatory.owner)
+#            print(self.owner)
             # One should apply here the effect on the card
             if card_purgatory.owner == self.owner:
                 self.effect_destruction(card_purgatory)
@@ -220,7 +220,7 @@ class Player:
             its hand on the board at the
             position coord
         """
-        card_played = self.hand.play(index_card)
+        card_played = self.hand.play(j)
         if isinstance(card_played, Monster):
             if "Impact" in card_played.effect.keys():
                 target_list = self.other_player.my_undamaged_monsters()
