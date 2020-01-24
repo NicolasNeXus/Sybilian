@@ -89,7 +89,7 @@ class Game_Graphic(QWidget):
             else:
                 self.other_hand.append(card)
                 card.setPixmap(QPixmap("hidden_card.png"))
-            card.move(20 + 70*j, 50 + 700*i)
+            card.move(130 + 70*j, 10 + 700*i)
             card.show()
         print([self.current_hand[i].card for i in range(len(self.current_hand))])
             
@@ -99,8 +99,8 @@ class Game_Graphic(QWidget):
             card = self.current_deck
         else:
             card = self.other_deck
-        card.setPixmap(QPixmap("monster.png"))
-        card.move(550, 100*i + 25)
+        card.setPixmap(QPixmap("deck_card.png"))
+        card.move(700, 250 + 150*i)
         card.show()
 
     def clearHand(self, hand: list) -> None:
@@ -164,14 +164,16 @@ class Game_Graphic(QWidget):
                     self.qapp.exec_()
 
         # button to change turns
-        self.finish_turn.move(700, 300)
+        self.finish_turn.move(700, 350)
         self.finish_turn.clicked.connect(change_turn)
         
         # Qlabel that displays the number of the current tour
         self.text_tour.setFont(QFont('SimHei', 20))
         self.text_tour.setStyleSheet("color: red;")
-        
         self.text_tour.move(700, 20)
+        
+        self.initDeck(self.players[0])
+        self.initDeck(self.players[1])
 
         # main window with its properties
         self.setWindowTitle('Sybilian')
