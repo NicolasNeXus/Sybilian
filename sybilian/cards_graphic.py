@@ -16,9 +16,10 @@ class Card_Graphic(QLabel):
         self.setAcceptDrops(True)
         self.setMouseTracking(True)
         self.explanation = QLabel('', parent)
+        self.explanation.setVisible(False)
         self.image = "monster.png" # card representation
         self.width = 50
-        self.height = 70
+        self.height = 100
         
     def __str__(self):
         return self.card.__str__()
@@ -36,7 +37,7 @@ class Card_Graphic(QLabel):
     def enterEvent(self, e):
         self.explanation.move(680, 400)
         self.explanation.setText(self.card.name + "\n\n" + self.card.game_text)
-        self.explanation.show()
+        self.explanation.setVisible(True)
         
     def leaveEvent(self, e):
         self.explanation.hide()

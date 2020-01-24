@@ -28,31 +28,26 @@ class Game_Graphic(QWidget):
         self.game = Game()
         self.tour = 0
         self.text_tour = QLabel('Tour : ' + str(self.tour), self)
+        self.deck_current = QLabel('', self)
+        self.deck_other = QLabel('', self)
+        self.len_current_deck = 0
+        self.len_other_deck = 0
         self.current_deck = Card_Graphic(Placeholder(), self) 
         self.other_deck = Card_Graphic(Placeholder(), self)
-        self.i_card_attacking, self.j_card_attacking = -1, -1
-        self.could_be_drag = False
+        self.i_card_attacking, self.j_card_attacking = None, None
 
         self.finish_turn = QPushButton('FINISH YOUR TURN', self) # button to finish your turn
-        self.setMouseTracking(True) # mouse tracking on the screen
-        self.setAcceptDrops(True)
-        self.index_current_card = -1
+        self.index_current_card = None
         self.qapp = app
         self.player_medal = [QRect(0, 0, 100, 50), QRect(0, 850, 100, 50)]
         self.color_players = [QColor(255, 0, 0, 200), QColor(0, 0, 255, 200)]
         self.position = [[QRect(150*j + 100, 100 + 150 * i, 50, 100) for j in range(3)] for i in range(2)] + [[QRect(150*j + 100, 400 + 150 * i, 50, 100) for j in range(3)] for i in range(2)]
+        self.reference_color = [[QColor(255, 0, 0, 200) for j in range(3)] for i in range(2)] + [[QColor(0, 0, 255, 200) for j in range(3)] for i in range(2)]
         self.color = [[QColor(255, 0, 0, 200) for j in range(3)] for i in range(2)] + [[QColor(0, 0, 255, 200) for j in range(3)] for i in range(2)]
         self.grid = [[Placeholder() for j in range(3)] for i in range(2)] + [[Placeholder() for j in range(3)] for i in range(2)]
         self.players = ("Player1", "Player2")
         
         self.initUi() # main window
-        self.initHand(self.game.get_current_hand(), self.players[0])
-        self.initHand([Placeholder() for i in range(4)], self.players[1])
-
-        self.initLife(9, self.players[0])
-        self.initLife(9, self.players[1])
-        
-        self.initBoard(self.grid)
 
     # Display player life
     def initLife(self, number_card: int, player_name: str) -> None:
@@ -75,6 +70,10 @@ class Game_Graphic(QWidget):
                 self.grid[i][j] = Card_Graphic(board[i][j], self)
                 if not isinstance(self.grid[i][j].card, Placeholder):
                     self.grid[i][j].setPixmap(QPixmap("monster.png"))
+                    if self.grid[i][j].card.life == 1:
+                        self.color[i][j] = QColor(105, 105, 105, 200)
+                else:
+                    self.color[i][j] = self.reference_color[i][j]
                 self.grid[i][j].move(self.position[i][j].x(), self.position[i][j].y())
                 self.grid[i][j].show()
 
@@ -133,7 +132,6 @@ class Game_Graphic(QWidget):
             for j in range(len(self.other_life)):
                 card = self.other_life[j]
                 card.hide()
-                #card.deleteLater()
                 card.setParent(None)
 
     def clearDeck(self, player_name: str) -> None:
@@ -149,16 +147,20 @@ class Game_Graphic(QWidget):
             flag_change_turn = self.game.can_end_turn()
             print('flag_turn', flag_change_turn)
             if flag_change_turn[0]:
-                self.current_hand, self.other_hand = self.other_hand, self.current_hand
+                self.tour += 1
+                self.current_deck, self.other_deck = self.other_deck, self.current_deck
+                #self.len_current_deck, self.len_other_deck = self.len_other_deck, self.len_current_deck
                 self.refresh(flag_change_turn)
                 self.ongo_attack = False                
-                self.tour += 1
+                
                 # text to indicate the current tour
                 self.text_tour.setText("Tour : " + str(self.tour))
                 if self.tour%2 == 0:
                     self.text_tour.setStyleSheet("color: red;")
                 else:
                     self.text_tour.setStyleSheet("color: blue;")
+                
+                # Game is ended ?
                 self.end = self.game.condition_endgame()
                 if self.end:
                     self.qapp.exec_()
@@ -166,34 +168,53 @@ class Game_Graphic(QWidget):
         # button to change turns
         self.finish_turn.move(700, 350)
         self.finish_turn.clicked.connect(change_turn)
-        
+
         # Qlabel that displays the number of the current tour
         self.text_tour.setFont(QFont('SimHei', 20))
         self.text_tour.setStyleSheet("color: red;")
-        self.text_tour.move(700, 20)
+        self.text_tour.move(700, 80)
+
+        self.initHand(self.game.get_current_hand(), self.players[0])
+        self.initHand([Placeholder() for i in range(4)], self.players[1])
+
+        self.initLife(9, self.players[0])
+        self.initLife(9, self.players[1])
         
         self.initDeck(self.players[0])
-        self.initDeck(self.players[1])
+        self.initDeck(self.players[1])        
+        
+        self.initBoard(self.grid)
+
+        # Number of cards in the deck
+        self.deck_current.move(760, 260)
+        self.deck_current.setVisible(False)
+        self.deck_other.move(760, 585)
+        self.deck_other.setVisible(False)
 
         # main window with its properties
         self.setWindowTitle('Sybilian')
         self.setGeometry(50, 50, 1000, 900)
-
+        self.setMouseTracking(True) # mouse tracking on the screen
+        self.setAcceptDrops(True)
 
     def refresh(self, list_area: list) -> None:
         if list_area[1] is not None:
             self.clearHand(self.current_hand)
             self.initHand(list_area[1], self.players[self.tour%2])
-        if list_area[2] == 0:
-            self.clearDeck(self.current_deck)
+        if list_area[2] is not None:
+            self.len_current_deck = list_area[2]
+            self.deck_current.setText(str(self.len_current_deck))
+            self.deck_current.setVisible(True)
         if list_area[3] is not None:
             self.clearLife(self.players[self.tour%2])
             self.initLife(list_area[3], self.players[self.tour%2])
         if list_area[5] is not None:
             self.clearHand(self.other_hand)
             self.initHand([Placeholder() for i in range(list_area[5])], self.players[(self.tour+1)%2])
-        if list_area[6] == 0:
-            self.clearDeck(self.other_deck)
+        if list_area[6] is not None:
+            self.len_other_deck = list_area[6]
+            self.deck_other.setText(str(self.len_other_deck))
+            self.deck_other.setVisible(True)
         if list_area[7] is not None:
             self.clearLife(self.players[(self.tour+1)%2])
             self.initLife(list_area[7], self.players[(self.tour+1)%2])
@@ -212,7 +233,7 @@ class Game_Graphic(QWidget):
 
     def move_card_from_hand_to_board(self, index_current_card: int, position: tuple) -> None:
         self.current_hand[self.index_current_card].move(self.position[position[0]][position[1]].x(), self.position[position[0]][position[1]].y())
-        self.index_current_card = -1
+        self.index_current_card = None
 
     # to play cards on the board (drag'n'drop) --> Jouer des cartes sur le plateau
     def dropEvent(self, e):
@@ -236,8 +257,6 @@ class Game_Graphic(QWidget):
         print(self.game.board)
         self.update()
 
-    ### GRAPHICS USE ###
-
     # color the areas where players put their cards
     def paintEvent(self, e):
         painter = QPainter(self)
@@ -250,12 +269,9 @@ class Game_Graphic(QWidget):
                 pen.setWidth(3)
                 painter.setPen(pen)
                 painter.drawRect(self.position[i][j])
-                # restore the initial Alpha mode for card that attack
-                if(self.color[i][j].alpha() == 50):
-                    self.color[i][j].setAlpha(200)
                 painter.fillRect(self.position[i][j], self.color[i][j])
-        
-        # dessiner les joueurs
+
+        # draw player's medal
         for i in range(len(self.player_medal)):
             painter.fillRect(self.player_medal[i], self.color_players[i])
         painter.end()
@@ -271,8 +287,8 @@ class Game_Graphic(QWidget):
                 self.refresh(flag_draw)
         
         # attack mode
-        if self.tour >= 1: # pas le premier tour pour qu'on puisse attaquer
-            # Y-a-til un clic sur le Board ?
+        if self.tour >= 1: # after the first tour, we can attack
+            # click on the board ?
             for i in range(len(self.grid)):
                 for j in range(len(self.grid[0])):
                     if self.position[i][j].contains(position):
@@ -282,15 +298,11 @@ class Game_Graphic(QWidget):
                             self.color[i][j].setAlpha(50)
                             if self.game.card_can_attack((i, j)):
                                 self.ongo_attack = True # ongoing attack
-
                                 self.qapp.setOverrideCursor(Qt.CrossCursor)
                         else: # attaque en cours
                             flag_attack = self.game.can_attack_monster((self.i_card_attacking, self.j_card_attacking), (i, j))
                             if flag_attack[0]: # monstre peut être attaqué ?
                                 self.refresh(flag_attack)
-                                if not isinstance(self.grid[i][j].card, Placeholder):
-                                    self.color[self.i_card_attacking][self.j_card_attacking] = QColor(105, 105, 105, 200)
-                                    self.color[i][j] = QColor(105, 105, 105, 200)
                             self.color[self.i_card_attacking][self.j_card_attacking].setAlpha(200)
                             self.ongo_attack = False
                             self.qapp.restoreOverrideCursor()
@@ -299,12 +311,10 @@ class Game_Graphic(QWidget):
             if self.player_medal[(self.tour+1)%2].contains(position):
                 if self.ongo_attack: # attaque en cours
                     flag_attack_player = self.game.can_attack_opponent_with_monster((self.i_card_attacking, self.j_card_attacking))
-                    if flag_attack_player[0]: # joueur peut être attaqué ?
-                        self.color[self.i_card_attacking][self.j_card_attacking] = QColor(105, 105, 105, 200)
+                    if flag_attack_player[0]: # player could be attacked ?
+                        self.color[self.i_card_attacking][self.j_card_attacking].setAlpha(200)
                         self.refresh(flag_attack_player)
-                        
-            # draw a card
-#            if QRect(se, , 50, 100).contains(position):
-#                if not self.ongo_attack:
+                        self.ongo_attack = False
+                        self.qapp.restoreOverrideCursor()
         
         self.update()
