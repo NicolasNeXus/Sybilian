@@ -4,7 +4,8 @@ class Card:
         a color and an effect that
         is stored as a dict
     """
-    def __init__(self, name : str, price : int, color : str, effect : dict, game_text : str,owner : str = None) -> None:
+
+    def __init__(self, name : str, price : int, color : str, effect : dict, game_text : str, owner : str = None) -> None:
         self.name = name
         self.price = price
         self.color = color
@@ -53,18 +54,19 @@ class Monster(Card):
             A card can attack an other card
         """
         assert(self.life > 0)
-        if "Powerful" in self.effect.keys() and self.effect["Powerful"]=="No_condition":
-            if "Powerful" in card_2.effect.keys() and card_2.effect["Powerful"]=="No_condition":
-                card_2.life-=1
+        if "Powerful" in self.effect.keys() and self.effect["Powerful"] == "No_condition":
+            if "Powerful" in card_2.effect.keys() and card_2.effect["Powerful"] == "No_condition":
+                card_2.life -= 1
             else:
                 card_2.life = 0
-            self.life-=1
+            self.life -= 1
         else:
             if "Powerful" in card_2.effect.keys() and card_2.effect["Powerful"]=="No_condition":
                 self.life = 0
             else:
-                self.life-=1
-            card_2.life-=1
+                self.life -= 1
+            card_2.life -= 1
+
 
 
 class Spell(Card):
