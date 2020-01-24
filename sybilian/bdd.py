@@ -8,14 +8,12 @@ from json import loads
 from cards import *
 from deck import *
 
-from PyQt5.QtWidgets import QApplication
-
-CLIENT = MongoClient('mongodb://TDLOG:sybilian@127.0.0.1:27017/sybiliandb')
+CLIENT = MongoClient('mongodb://TDLOG:sybilian@127.0.0.1/sybiliandb')
 DB = CLIENT.sybiliandb
 COLLECTION = DB.cards
 COULEUR = {"A" : "blue", "B" : "red", "C" : "orange", "D" : "yellow", "E" : "gray", "F" : "green", "G" : "purple" }
 
-def reset_bdd() -> None:
+def reset_bd() -> None:
     """
         Delete every document in
         the database
@@ -53,7 +51,7 @@ def upload_tsv_bdd(csv_file : str) -> None:
                 print(e)
                 pass
 
-def pull_card(id_card : str, app : QApplication) -> Monster:
+def pull_card(id_card : str) -> Monster:
     """
         Ask the BDD to pull the card
         with the specic id
@@ -62,10 +60,10 @@ def pull_card(id_card : str, app : QApplication) -> Monster:
     if COLLECTION.count_documents({"id":id_card})==0:
         return Placeholder()
     for cards in cursor:
-        return Monster(cards["name"], app, 1, cards["color"], cards["kin"], cards["effect"], cards["game_text"],cards["id"])
+        return Monster(cards["name"], 1, cards["color"], cards["kin"], cards["effect"], cards["game_text"],cards["id"])
 
 
-def csv_to_deck(csv_file : str, app : QApplication) -> Deck:
+def csv_to_deck(csv_file : str) -> Deck:
     """
         Function that reads a csv
         of ID and return a Deck
@@ -74,7 +72,9 @@ def csv_to_deck(csv_file : str, app : QApplication) -> Deck:
     with open(csv_file, newline = '') as csvfile:
         parse = csv.reader(csvfile, delimiter = ",", quotechar = "|")
         for j,row in enumerate(parse):
-            deck.add(pull_card(row[0], app))
+            card_pulled = pull_card(row[0])
+            card_pulled.owner = csv_file
+            deck.add(card_pulled)
     return deck
 
 

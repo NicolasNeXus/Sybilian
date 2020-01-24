@@ -10,17 +10,9 @@ class Board:
         """
             We create an empty grid
             with the purgatory zone
-        """        
+        """
         self.grid = [[Placeholder() for i in range(3)] for j in range(4)]
         self.purgatory = Deck([])
-        
-    def play(self, card : Card, coord : tuple) -> None:
-        """
-            put a card on the board
-        """
-        i,j = coord
-        self.grid[i][j] = card
-        card.coord = coord
 
     def __str__(self) -> None:
         """
@@ -46,6 +38,16 @@ class Board:
         """
         for i,row in enumerate(self.grid):
             for j,monster in enumerate(row):
-                if isinstance(monster, Monster) and monster.life <= 0:
+                if isinstance(monster, Monster) and monster.life<=0:
                     self.purgatory.add(monster)
-                    self.grid[i][j] = Card("void", "-1","","") 
+                    self.grid[i][j] = Placeholder()
+
+
+    def play(self, card : Card, coord : tuple) -> None:
+        """
+            put a card on the board
+        """
+        i,j = coord
+        self.grid[i][j] = card
+        card.coord = coord
+
