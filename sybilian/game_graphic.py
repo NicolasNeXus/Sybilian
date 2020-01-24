@@ -100,7 +100,7 @@ class Game_Graphic(QWidget):
         else:
             card = self.other_deck
         card.setPixmap(QPixmap("deck_card.png"))
-        card.move(700, 250 + 150*i)
+        card.move(750, 150 + 325*i)
         card.show()
 
     def clearHand(self, hand: list) -> None:
@@ -177,7 +177,7 @@ class Game_Graphic(QWidget):
 
         # main window with its properties
         self.setWindowTitle('Sybilian')
-        self.setGeometry(50, 50, 900, 900)
+        self.setGeometry(50, 50, 1000, 900)
 
 
     def refresh(self, list_area: list) -> None:
@@ -279,23 +279,32 @@ class Game_Graphic(QWidget):
                         if not self.ongo_attack: # pas encore d'attaque
                             self.i_card_attacking = i
                             self.j_card_attacking = j
+                            self.color[i][j].setAlpha(50)
                             if self.game.card_can_attack((i, j)):
                                 self.ongo_attack = True # ongoing attack
-                                self.color[i][j].setAlpha(50)
+
                                 self.qapp.setOverrideCursor(Qt.CrossCursor)
                         else: # attaque en cours
                             flag_attack = self.game.can_attack_monster((self.i_card_attacking, self.j_card_attacking), (i, j))
                             if flag_attack[0]: # monstre peut être attaqué ?
                                 self.refresh(flag_attack)
                                 if not isinstance(self.grid[i][j].card, Placeholder):
+                                    self.color[self.i_card_attacking][self.j_card_attacking] = QColor(105, 105, 105, 200)
                                     self.color[i][j] = QColor(105, 105, 105, 200)
+                            self.color[self.i_card_attacking][self.j_card_attacking].setAlpha(200)
                             self.ongo_attack = False
+                            self.qapp.restoreOverrideCursor()
             
             # attack a player
             if self.player_medal[(self.tour+1)%2].contains(position):
                 if self.ongo_attack: # attaque en cours
                     flag_attack_player = self.game.can_attack_opponent_with_monster((self.i_card_attacking, self.j_card_attacking))
                     if flag_attack_player[0]: # joueur peut être attaqué ?
+                        self.color[self.i_card_attacking][self.j_card_attacking] = QColor(105, 105, 105, 200)
                         self.refresh(flag_attack_player)
-        self.qapp.restoreOverrideCursor()
+                        
+            # draw a card
+#            if QRect(se, , 50, 100).contains(position):
+#                if not self.ongo_attack:
+        
         self.update()
