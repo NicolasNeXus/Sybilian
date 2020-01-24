@@ -19,7 +19,7 @@ class Deck:
             Draw a card from the deck
             and return the card
         """
-        self.size -= 1
+        self.size-=1
         return self.container.pop()
 
     def add_end(self, card : Card) -> None:
@@ -27,7 +27,7 @@ class Deck:
             Add a card at the end of the deck
         """
         self.container.appendleft(card)
-        self.size += 1
+        self.size+=1
 
     def add(self, card : Card) -> None:
         """
@@ -77,25 +77,18 @@ class Hand():
         self.deck = deck
         self.life = life
         self.max_len = 10
+        self.size = len(self.container)
         for i in range(4):
             self.add(deck.draw())
-
-
-    def size(self) -> int:
-        """
-            Give the size of
-            the hand of the player
-        """
-        return len(self.container)
-
 
     def add(self, card : Monster) -> None:
         """
             add a card to the hand
             container
         """
-        if len(self.container) < 10:
+        if len(self.container) < self.max_len:
             self.container.append(card)
+            self.size+=1
 
     def read_card(self, i : int) -> Monster:
         """
@@ -125,12 +118,8 @@ class Hand():
         """
             play the j-th card of the hand
         """
-        storage = deque([])
-        for i in range(j):
-            storage.append(self.container.pop())
-        card_j = self.container.pop()
-        for i in range(j):
-            self.container.append(storage.pop())
+        card_j = self.container.pop(j)
+        self.size-=1
         return card_j
         
     def __str__(self) -> str:
