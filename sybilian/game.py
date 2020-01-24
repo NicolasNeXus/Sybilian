@@ -1,286 +1,253 @@
-from PyQt5.QtGui import QColor
-
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Nov 29 11:08:41 2019
-
-@author: clari
-"""
-
 from cards import *
 from deck import *
 from board import *
 from player import *
 
-# graphics use
-from PyQt5.QtWidgets import QPushButton, QWidget, QApplication, QLabel
-from PyQt5.QtCore import Qt, QMimeData, QRect
-from PyQt5.QtGui import QPainter, QColor, QPixmap, QDrag, QPen, QCursor
-import sys
-
-class Game(QWidget):
-    def __init__(self, app : QApplication) -> None:
-        super().__init__()
+class Game:
+    def __init__(self) -> None:
+        """
+            self.index : index of the player who is playing
+        """
+        self.board = Board()
+        # player_one has access to the first and second lines of the board
+        # player_two has access to the third and fourth lines of the board
+        self.players = (Player("deckC001.csv", self.board, [1, 0]), Player("deckB001.csv", self.board, [2, 3]))
+        self.players[0].other_player = self.players[1]
+        self.players[1].other_player = self.players[0]
+        print(self.players[0].hand)
+        self.index = 0
+        self.nb_actions = 2
         self.end = False
-        self.ongo_attack = False
-        self.current_hand = [Placeholder() for i in range(4)]
-        self.other_hand = [Placeholder() for i in range(4)]
-        self.current_life = []
-        self.other_life = []
-        self.game = GameControl()
-        self.tour = 0
-        self.current_deck = Card_Graphic(Placeholder(), app) 
-        self.other_deck = Card_Graphic(Placeholder(), app)
-        self.i_card_attacking, self.j_card_attacking = -1, -1
-        #self.i_card_attacked, self.j_card_attacked = -1, -1
 
-        self.finish_turn = QPushButton('FINISH YOUR TURN', self) # button to finish your turn
-        self.setMouseTracking(True) # mouse tracking on the screen
-        self.setAcceptDrops(True)
-        self.index_current_card = -1
-        self.qapp = app
-        self.player_medal = [QRect(0, 0, 100, 50), QRect(0, 850, 100, 50)]
-        self.color_players = [QColor(255, 0, 0, 200), QColor(0, 0, 255, 200)]
-        self.position = [[QRect(150*j + 100, 100 + 150 * i, 50, 100) for j in range(3)] for i in range(2)] + [[QRect(150*j + 100, 400 + 150 * i, 50, 100) for j in range(3)] for i in range(2)]
-        self.color = [[QColor(255, 0, 0, 200) for j in range(3)] for i in range(2)] + [[QColor(0, 0, 255, 200) for j in range(3)] for i in range(2)]
-        self.grid = [[Placeholder() for j in range(3)] for i in range(2)] + [[Placeholder() for j in range(3)] for i in range(2)]
-        self.players = ("Player1", "Player2")
-        
-        self.initUi() # main window
-        self.initHand(self.current_hand, self.players[0])
-        self.initHand([Placeholder() for i in range(4)], self.players[1])
+    def condition_endgame(self) -> bool:
+        """
+            return True if a player won,
+            False otherwise
+        """
+        if self.players[0].life_points > 0 and self.players[1].life_points > 0:
+            return False
+        elif self.players[0].life_points == 0:
+            print("Le joueur " + str(self.players[0].owner) + " a gagné!")
+            return True
+        elif self.players[1].life_points == 0:
+            print("Le joueur " + str(self.players[1].owner) + " a gagné!")
+            return True
 
-        self.initLife(9, self.players[0])
-        self.initLife(9, self.players[1])
-
-    # Display player life
-    def initLife(self, number_card: int, player_name: str) -> None:
-        # display life points for the 2 players
-        i = self.players.index(player_name)
-        for j in range(number_card):
-            card = Card_Graphic(Placeholder(), self.qapp)
-            card.setPixmap(QPixmap("hidden_card.png"))
-            card.move(550, 300*i + 100 + 25*j)
-            if player_name == self.players[self.tour%2]:
-                self.current_life.append(card)
-            else:
-                self.other_life.append(card)
-            card.show()
+    def can_play_monster(self, index_card : int, coord : tuple) -> bool:
+        """
+            return True if the player playing can play the card
+            return False otherwise
+            index_card : index of the card that we want to play
+            coord : position where we want to put the card
+        """
+        player_playing = self.players[self.index]
+        opponent = self.players[(self.index + 1) % 2]
+        # The owner's card that wants to play is the player who is playing and
+        # the card is a monster
+        if isinstance(player_playing.hand.read_card(index_card), Monster):
+            # The player still have actions left
+            if self.nb_actions > 0:
+                # The coordinates are valid
+                if coord[0] in player_playing.lines and coord[1] in [0, 1, 2]:
+                        # The spot is empty
+                        if isinstance(self.board.get_monster(coord), Placeholder):
+                            # Impact
+                            if "Impact" in player_playing.hand.read_card(index_card).effect.keys():
+                                player_playing.play(index_card, coord)
+                                self.nb_actions -= 1
+                                return [True, player_playing.hand.container, player_playing.deck.size, player_playing.life.size, player_playing.grave.size, opponent.hand.size, opponent.deck.size, opponent.life.size, opponent.grave.size, self.board] 
+                            else:
+                                player_playing.play(index_card, coord)
+                                self.nb_actions -= 1
+                                return [True, player_playing.hand.container, player_playing.deck.size, None, None, None, None, None, None, self.board]
+        print('False')
+        print(player_playing.hand.read_card(index_card))
+        return [False]
     
-    # display the board
-    def initBoard(self, board: list) -> None:
-        for i in range(len(board)):
-            for j in range(len(board[0])):
-                self.grid[i][j] = Card_Graphic(board[i][j])
-                self.grid[i][j].move(self.position[i][j])
-                self.grid[i][j].show()
+    def get_current_hand(self):
+        return self.players[self.index].hand.container
 
-    def initHand(self, hand: list, player_name: str) -> None:
-        # display the hand of a player
-        i = self.players.index(player_name)
-        for j in range(len(hand)):
-            card = Card_Graphic(hand[i], self.qapp)
-            if player_name == self.players[self.tour%2]:
-                card.setPixmap(QPixmap("monster.png"))
-            else:
-                card.setPixmap(QPixmap("hidden_card.png"))
-            card.move(20 + 70*j, 50 + 700*i)
-            card.show()
-            
-    def initDeck(self, player_name: str) -> None:
-        i = self.players.index(player_name)
-        if player_name == self.players[self.tour%2]:
-            card = self.current_deck
-        else:
-            card = self.other_deck
-        card.setPixmap(QPixmap("monster.png"))
-        card.move(550, 100*i + 25)
-        card.show()
-
-    def clearHand(self, hand: list) -> None:
-        # erase (graphically) the hand of the current player
-        for i in range(len(hand)):
-            card = hand[i]
-            card.hide()
-            card.deleteLater()
+    def can_play_spell(self, index_card : int) -> bool:
+        """
+            return True if the player playing can play the card
+            return False otherwise
+            index_card : index of the card that we want to play
+        """
+        player_playing = self.players[self.index]
+        opponent = self.players[(self.index + 1) % 2]
+        # The owner's card that wants to play is the player who is playing and
+        # the card is a spell
+        if isinstance(player_playing.hand.read_card(index_card), Spell):
+            player_playing.play(index_card)
+            return [True, player_playing.hand.container, player_playing.deck.size, player_playing.life.size, player_playing.grave.size, opponent.hand.size, opponent.deck.size, opponent.life.size, opponent.grave.size, self.board]
+        return [False]
     
-    # clear board
-    def clearBoard(self):
-        for i in range(len(grid)):
-            for j in range(len(grid[0])):
-                self.grid[i][j].hide()
-                self.grid[i][j].deleteLater()        
+    def can_draw_card(self):
+        """
+            return True if the player playing can draw a card from his deck
+            and the different decks that need to be updated
+        """
+        player_playing = self.players[self.index]
+        # The player still have actions left
+        if self.nb_actions > 0:
+            # The player's deck is not empty:
+            if player_playing.deck.size > 0:
+                # Verify that the player have less than max_len cards in his hand
+                if player_playing.hand.size < player_playing.hand.max_len:
+                    player_playing.draw()
+                    self.nb_actions -= 1
+                    return [True, player_playing.hand.container, player_playing.deck.size, None, None, None, None, None, None, None]
+                # The card is added to the graveyard
+                else:
+                    player_playing.draw()
+                    self.nb_actions -= 1
+                    return [True, None, player_playing.deck.size, None, player_playing.grave.size, None, None, None, None, None]
+            # We draw in the hp
+            elif player_playing.deck.size == 0 and player_playing.life.size > 0:
+                # Verify that the player have less than max_len cards in his hand
+                if player_playing.hand.size < player_playing.hand.max_len:
+                    player_playing.draw()
+                    self.nb_actions -= 1
+                    return [True, player_playing.hand.container, None, player_playing.life.size, None, None, None, None, None, None]
+                # The card is added to the graveyard
+                else:
+                    player_playing.draw()
+                    self.nb_actions -= 1
+                    return [True, None, None, player_playing.life.size, player_playing.grave.size, None, None, None, None, None]
+        return [False]
 
-    def clearLife(self, player_name: str) -> None:
-        # erase (graphically) the life of a player
-        i = self.players.index(player_name)
-        card = None
-        for j in range(number_card):
-            if player_name == self.players[self.tour%2]:
-                card = self.current_life[j]
-            else:
-                card = self.other_life[j]
-            card.hide()
-            card.deleteLater()
-
-    def clearDeck(self, player_name: str) -> None:
-        if player_name == self.players[self.tour%2]:
-            card = self.current_deck
-        else:
-            card = self.other_deck
-        card.hide()
-
-    def initUi(self) -> None:
-        # event for changing turns 
-        def change_turn():
-            flag_change_turn = self.game.can_end_turn()
-            if flag_change_turn[0]:
-                self.refresh(flag_change_turn)
-                self.ongo_attack = False
-                # clear hands
-                self.clearHand(self.current_hand)
-                self.clearHand(self.other_hand)
-                
-                self.tour += 1
-                self.end = self.game_condition_endgame()
-                if self.end:
-                    self.qapp.exec_()
-
-            # init hands
-            self.initHand(self.current_hand, self.players[self.tour%2])
-            self.initHand(self.other_hand, self.players[(self.tour+1)%2])
-            
-            # init lives
-            number_life = back_
-            self.initLife(number_life, self.players[self.tour%2])
-
-        # button to change turns
-        self.finish_turn.move(700, 300)
-        self.finish_turn.clicked.connect(change_turn)
-
-        # main window with its properties
-        self.setWindowTitle('Sybilian')
-        self.setGeometry(50, 50, 900, 900)
-
-
-    def refresh(self, list_area: list) -> None:
-        if list_area[1] is not None:
-            self.clearHand(self.current_hand)
-            self.initHand(list_area[1], self.players[self.tour%2])
-        if list_area[2] == 0:
-            self.clearDeck(self.current_deck)
-        if list_area[3] is not None:
-            self.clearLife(self.players[self.tour%2])
-            self.initLife(list_area[3], self.players[self.tour%2])
-        if list_area[5] is not None:
-            self.clearHand(self.other_hand)
-            self.initHand(list_area[5], self.players[(self.tour+1)%2])
-        if list_area[6] == 0:
-            self.clearDeck(self.other_deck)
-        if list_area[7] is not None:
-            self.clearLife(self.players[(self.tour+1)%2])
-            self.initLife(list_area[7], self.players[(self.tour+1)%2])
-        if list_area[9] is not None:
-            self.clearBoard()
-            self.initBoard(list_area[9].grid)
-
-    # est-ce qu'on a le droit de prendre cette carte dans la main ?
-    def back_take_card_from_hand(self, player : str, index_card : int) -> bool:
-        return(True)
-
-    def dragEnterEvent(self, e):
-        for i in range(len(self.current_hand)):
-            card = self.current_hand[i] # chosen card
-            if QRect(card.x(), card.y(), card.width, card.height).contains(e.pos()):
-                self.index_current_card = i
-                e.accept()
-
-    def move_card_from_hand_to_board(self, index_current_card : int, position : tuple) -> None:
-        self.current_hand[self.index_current_card].move(self.position[position[0]][position[1]].x(), self.position[position[0]][position[1]].y())
-        self.index_current_card = -1
-
-    # to play cards on the board (drag'n'drop) --> Jouer des cartes sur le plateau
-    def dropEvent(self, e):
-        position = e.pos()
-        flag_spell = self.game.can_play_spell(self.index_current_card)
-        if flag_spell[0]: # spell
-            e.accept()
-            self.refresh(flag_spell)
-        else: # monster
-            for i in range(len(self.grid)):
-                for j in range(len(self.grid[0])):
-                    if self.position[i][j].contains(position):
-                        pos = (i, j)
-                        flag_drag = self.game.can_play_monster(self.index_current_card, pos)
-
-                        if flag_drag[0]:
-                            self.move_card_from_hand_to_board(self.index_current_card, pos)
-                            e.setDropAction(Qt.MoveAction)
-                            e.accept()
-                            self.refresh(flag_drag)
-        self.update()
-
-    ### GRAPHICS USE ###
-
-    # color the areas where players put their cards
-    def paintEvent(self, e):
-        painter = QPainter(self)
-        # display the board
-        for i in range(len(self.board.grid)):
-            for j in range(len(self.board.grid[0])):
-                painter.eraseRect(self.position[i][j])
-                # black borders with a 3-width pen
-                pen = QPen(Qt.black)
-                pen.setWidth(3)
-                painter.setPen(pen)
-                painter.drawRect(self.position[i][j])
-                # restore the initial Alpha mode for card that attack
-                if(self.color[i][j].alpha() == 50):
-                    self.color[i][j].setAlpha(200)
-                painter.fillRect(self.position[i][j], self.color[i][j])
+    def card_can_attack(self, coord : tuple) -> bool:
+        """ Return True if the card with the coordinates coord can attack """
+        player_playing = self.players[self.index]
+        # The coordinates are valid
+        if coord[0] in player_playing.lines and coord[1] in [0, 1, 2]:
+            return True
+        return False
         
-        # dessiner les joueurs
-        for i in range(len(self.player_medal)):
-            painter.fillRect(self.player_medal[i], self.color_players[i])
-        painter.end()
+    def can_attack_monster(self, coord1 : tuple, coord2 : tuple) -> list:
+        """
+            Return True if the player can attack an opponent's monster with his
+            own monster
+            coord1 : coordinates of the monster which is supposed to attack
+            coord2 : coordinates of the monster which is supposed to be attacked
+        """
+        player_playing = self.players[self.index]
+        opponent = player_playing.other_player
+        # The player who wants to attack is the player who is playing
+        if  coord1[0] in player_playing.lines and coord1[1] in [0, 1, 2]:
+            # The player is attacking his oponent
+            if coord2[0] in opponent.lines and coord2[1] in [0, 1, 2]:
+                # We have two monsters
+                if isinstance(self.board.get_monster(coord1), Monster) and isinstance(self.board.get_monster(coord2), Monster):
+                    # The player wants to attack the first line of his opponent
+                    if coord2[0] == opponent.lines[0]:
+                        player_playing.attack_monster(self.board.get_monster(coord1), self.board.get_monster(coord2))
+                        return [True, player_playing.hand.container, player_playing.deck.size, player_playing.life.size, player_playing.grave.size, opponent.hand.size, opponent.deck.size, opponent.life.size, opponent.grave.size, self.board] 
+                    # The player wants to attack the second line of his opponent
+                    elif coord2[1] == opponent.lines[1] and player_playing.verify_first_line_opponent_empty():
+                        player_playing.attack_monster(self.board.get_monster(coord1), self.board.get_monster(coord2))
+                        return [True, player_playing.hand.container, player_playing.deck.size, player_playing.life.size, player_playing.grave.size, opponent.hand.size, opponent.deck.size, opponent.life.size, opponent.grave.size, self.board] 
+        return [False]
 
-
-    # attack of a monster --> Attaquer monstres ou joueurs
-    def mouseReleaseEvent(self, e):
-        position = e.pos()
-        # draw a card from the deck
-        if QRect(self.current_deck.x(), self.current_deck.y(), self.current_deck.width, self.current_deck.height).contains(e.pos()):
-            flag_draw = self.game.can_draw_card()
-            if flag_draw[0]:
-                self.refresh(flag_draw)
-        
-        # attack mode
-        if self.tour > 1: # pas le premier tour pour qu'on puisse attaquer
-            # Y-a-til un clic sur le Board ?
-            for i in range(len(self.grid)):
-                for j in range(len(self.grid[0])):
-                    if self.position[i][j].contains(position):
-                        if not self.ongo_attack: # pas encore d'attaque
-                            self.i_card_attacking = i
-                            self.j_card_attacking = j
-                            if self.game.card_can_attack((i, j)):
-                                self.ongo_attack = True # ongoing attack
-                                self.color[i][j].setAlpha(50)
-                                self.qapp.setOverrideCursor(Qt.CrossCursor)
-                        else: # attaque en cours
-                            flag_attack = self.game.can_attack_monster((self.i_card_attacking, self.j_card_attacking), (i, j))
-                            if flag_attack[0]: # monstre peut être attaqué ?
-                                self.refresh(flag_attack)
-                                if not isinstance(self.grid[i][j].card, Placeholder):
-                                    self.color[i][j] = QColor(105, 105, 105, 200)
-
-                            self.ongo_attack = False
-                            self.qapp.restoreOverrideCursor()
+    def can_attack_opponent_with_monster(self, coord : tuple):
+        """
+            Return True if the player can attack his opponent with his monster
+            coord : coordinates of the monster which is supposed to attack
+        """
+        player_playing = self.players[self.index]
+        opponent = player_playing.other_player
+        # The player who wants to attack is the player who is playing
+        if coord[0] in player_playing.lines and coord[1] in [0, 1, 2]:
+            # We have a monster
+            if isinstance(self.board.get_monster(coord), Monster):
+                # The first line of the opponent is empty
+                if player_playing.verify_first_line_opponent_empty():
+                    player_playing.attack_player_with_monster(self.board.get_monster(coord), opponent)
+                    return [True, player_playing.hand.container, player_playing.deck.size, player_playing.life.size, player_playing.grave.size, opponent.hand.size, opponent.deck.size, opponent.life.size, opponent.grave.size, self.board] 
+        return [False]
+    
+    def can_end_turn(self) -> bool:
+        player_playing = self.players[self.index]
+        opponent = player_playing.other_player
+        # The player has no actions left
+        if self.nb_actions == 0:
+            self.index = (self.index + 1)%2
+            self.nb_actions = 2
+            self.players[self.index].draw()
+            return [True, player_playing.hand.container, player_playing.deck.size, player_playing.life.size, player_playing.grave.size, opponent.hand.size, opponent.deck.size, opponent.life.size, opponent.grave.size, self.board]
+        return [False]
             
-            # attack a player
-            if self.player_medal[(self.tour+1)%2].contains(position):
-                if self.ongo_attack: # attaque en cours
-                    flag_attack_player = self.game.can_attack_opponent_with_monster((self.i_card_attacking, self.j_card_attacking))
-                    if flag_attack_player[0]: # joueur peut être attaqué ?
-                        self.refresh(flag_attack_player)
-        self.update()
+
+    def end_turn(self):
+        """
+            Updates the index of the player currently playing and the number
+            of actions
+        """
+        self.index = (self.index + 1)%2
+        self.nb_actions = 2
+        self.players[self.index].draw()
+        return (self.players[self.index].hand.container, self.players[self.index].life.size)
+
+    def turn(self):
+        """
+            /!\ pour l'instant un joueur peut juste jouer des monstres
+        """
+        nb_actions = 2
+        while nb_actions > 0:
+            print(self.board)
+            action = str(input("Entrer 'p' pour piocher une carte, 'j' pour jouer une carte, 'c' pour regarder les cartes dans votre main: "))
+            if action == 'p':
+                self.players[self.nb_turns%2].draw()
+                nb_actions -= 1
+            elif action == 'c':
+                print(self.players[self.nb_turns%2].hand)
+            elif action == 'j':
+                j = int(input("Quelle carte voulez-vous jouer (entrer un nombre entre 1 et "+ str(self.players[self.nb_turns%2].hand.size) +"): "))
+                if isinstance(self.players[self.nb_turns%2].hand.read_card(j - 1), Monster):
+                    x = int(input("Sur quelle ligne voulez-vous jouer votre carte (" + str(self.players[self.nb_turns%2].lines[0]) +" ou " + str(self.players[self.nb_turns%2].lines[1]) + "): "))
+                    y = int(input("Sur quelle colonnes voulez-vous jouer votre carte (0 ou 1 ou 2): "))
+                    # The card is actually played
+                    if self.players[self.nb_turns%2].play(j, (x, y)):
+                        nb_actions -= self.board.grid[x][y].price
+                elif isinstance(self.players[self.nb_turns%2].hand.read_card(j - 1), Spell):
+                    #voir ensuite comment faire pour les sorts
+                    nb_actions -= self.players[self.nb_turns%2].hand.read_card(j).price
+                    self.board.purgatory.add(self.players[self.nb_turns%2].hand.play(j))
+            print("Il vous reste " + str(nb_actions))
+        # Player are allowed to attack after their first turn
+        if self.nb_turns > 1:
+            print("Point de vie: " + str(self.players[self.nb_turns%2].life_points))
+            print("Point de vie: " + str(self.players[1 - self.nb_turns%2].life_points))
+            attack = str(input("Entrer 'm' pour attaquer un monstre de l'adversaire, 'a' pour attaquer directement votre adversaire, 'c' pour regarder les cartes dans votre main, 't' pour terminer votre tour: "))
+            while attack != 't':
+                if attack == 'm':
+                    #vérifier que c'est bien le monstre du joueur???
+                    x = int(input("Ligne de votre monstre qui attaque: "))
+                    y = int(input("Colonne de votre monstre qui attaque: "))
+                    x_other_player = int(input("Ligne du monstre que vous voulez attaquer: "))
+                    y_other_player = int(input("Colonne du monstre que vous voulez attaquer: "))
+                    if x in self.players[self.nb_turns%2].lines and y in [0, 1, 2]:
+                        if self.players[self.nb_turns%2].verify_coord_attack((x_other_player, y_other_player)):
+                            self.players[self.nb_turns%2].attack_monster(self.board.grid[x][y], self.board.grid[x_other_player][y_other_player])
+                            attack = str(input("Entrer 'm' pour attaquer un monstre de l'adversaire, 'a' pour attaquer directement votre adversaire, 'c' pour regarder les cartes dans votre main, 't' pour terminer votre tour: "))
+                        else :
+                            print("Vous n'attaquez pas un monstre de votre adversaire")
+                    else:
+                        print("Ce n'est pas un de vos monstre que vous voulez faire attaquer")
+                elif attack == 'a':
+                    x = int(input("Ligne de votre monstre qui attaque: "))
+                    y = int(input("Colonne de votre monstre qui attaque: "))
+                    if x in self.players[self.nb_turns%2].lines and y in [0, 1, 2]:
+                        self.players[self.nb_turns%2].attack_player_with_monster(self.board.grid[x][y], self.players[(self.nb_turns + 1 )%2])
+                    else:
+                        print("Ce n'est pas un de vos monstre que vous voulez faire attaquer")
+                elif action == 'c':
+                    print(self.players[self.nb_turns%2].hand)
+            attack = str(input("Entrer 'm' pour attaquer un monstre de l'adversaire, 'a' pour attaquer directement votre adversaire, 'c' pour regarder les cartes dans votre main, 't' pour terminer votre tour: "))
+            print(self.board)
+
+    def game_loop(self):
+        while not self.end:
+            self.turn()
+            self.nb_turns += 1
+            self.end = self.condition_endgame()
