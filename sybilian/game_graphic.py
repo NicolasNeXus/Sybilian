@@ -29,9 +29,11 @@ class Game_Graphic(QWidget):
         self.tour = 0
         self.text_tour = QLabel('Tour : ' + str(self.tour), self)
         self.deck_current = QLabel('', self)
+        self.deck_current.setVisible(False)
         self.deck_other = QLabel('', self)
-        self.len_current_deck = 0
-        self.len_other_deck = 0
+        self.deck_other.setVisible(False)
+        self.len_current_deck = 27
+        self.len_other_deck = 27
         self.current_deck = Card_Graphic(Placeholder(), self) 
         self.other_deck = Card_Graphic(Placeholder(), self)
         self.i_card_attacking, self.j_card_attacking = None, None
@@ -148,9 +150,17 @@ class Game_Graphic(QWidget):
             print('flag_turn', flag_change_turn)
             if flag_change_turn[0]:
                 self.tour += 1
-                self.current_deck, self.other_deck = self.other_deck, self.current_deck
                 #self.len_current_deck, self.len_other_deck = self.len_other_deck, self.len_current_deck
                 self.refresh(flag_change_turn)
+                print('current', self.len_current_deck, 'opp', self.len_other_deck)
+                self.current_deck, self.other_deck = self.other_deck, self.current_deck
+#                self.deck_current.setText(str(self.len_current_deck))
+#                self.deck_current.setVisible(True)
+#                self.deck_other.setText(str(self.len_other_deck))
+#                self.deck_other.setVisible(True)
+                #self.len_current_deck, self.len_other_deck = self.len_other_deck, self.len_current_deck
+                #self.len_current_deck, self.len_other_deck = self.len_other_deck, self.len_current_deck
+                #self.len_current_deck, self.len_other_deck = self.len_other_deck, self.len_current_deck
                 self.ongo_attack = False                
                 
                 # text to indicate the current tour
@@ -163,7 +173,7 @@ class Game_Graphic(QWidget):
                 # Game is ended ?
                 self.end = self.game.condition_endgame()
                 if self.end:
-                    self.qapp.exec_()
+                    self.close()
 
         # button to change turns
         self.finish_turn.move(700, 350)
@@ -186,10 +196,7 @@ class Game_Graphic(QWidget):
         self.initBoard(self.grid)
 
         # Number of cards in the deck
-        self.deck_current.move(760, 260)
-        self.deck_current.setVisible(False)
-        self.deck_other.move(760, 585)
-        self.deck_other.setVisible(False)
+
 
         # main window with its properties
         self.setWindowTitle('Sybilian')
@@ -203,8 +210,6 @@ class Game_Graphic(QWidget):
             self.initHand(list_area[1], self.players[self.tour%2])
         if list_area[2] is not None:
             self.len_current_deck = list_area[2]
-            self.deck_current.setText(str(self.len_current_deck))
-            self.deck_current.setVisible(True)
         if list_area[3] is not None:
             self.clearLife(self.players[self.tour%2])
             self.initLife(list_area[3], self.players[self.tour%2])
@@ -213,8 +218,6 @@ class Game_Graphic(QWidget):
             self.initHand([Placeholder() for i in range(list_area[5])], self.players[(self.tour+1)%2])
         if list_area[6] is not None:
             self.len_other_deck = list_area[6]
-            self.deck_other.setText(str(self.len_other_deck))
-            self.deck_other.setVisible(True)
         if list_area[7] is not None:
             self.clearLife(self.players[(self.tour+1)%2])
             self.initLife(list_area[7], self.players[(self.tour+1)%2])
@@ -285,6 +288,12 @@ class Game_Graphic(QWidget):
             flag_draw = self.game.can_draw_card()
             if flag_draw[0]:
                 self.refresh(flag_draw)
+                self.deck_current.move(760, 260)
+                self.deck_current.setText(str(self.len_current_deck))
+                self.deck_current.setVisible(True)
+                self.deck_other.move(760, 590)
+                self.deck_other.setText(str(self.len_other_deck))
+                self.deck_other.setVisible(True)
         
         # attack mode
         if self.tour >= 1: # after the first tour, we can attack
@@ -292,7 +301,7 @@ class Game_Graphic(QWidget):
             for i in range(len(self.grid)):
                 for j in range(len(self.grid[0])):
                     if self.position[i][j].contains(position):
-                        if not self.ongo_attack: # pas encore d'attaque
+                        if not self.ongo_attack: # no ongoing attack
                             self.i_card_attacking = i
                             self.j_card_attacking = j
                             self.color[i][j].setAlpha(50)
@@ -301,7 +310,7 @@ class Game_Graphic(QWidget):
                                 self.qapp.setOverrideCursor(Qt.CrossCursor)
                         else: # attaque en cours
                             flag_attack = self.game.can_attack_monster((self.i_card_attacking, self.j_card_attacking), (i, j))
-                            if flag_attack[0]: # monstre peut être attaqué ?
+                            if flag_attack[0]: # monster could be attacked ?
                                 self.refresh(flag_attack)
                             self.color[self.i_card_attacking][self.j_card_attacking].setAlpha(200)
                             self.ongo_attack = False
@@ -309,12 +318,17 @@ class Game_Graphic(QWidget):
             
             # attack a player
             if self.player_medal[(self.tour+1)%2].contains(position):
-                if self.ongo_attack: # attaque en cours
+                if self.ongo_attack: # ongoing attack
                     flag_attack_player = self.game.can_attack_opponent_with_monster((self.i_card_attacking, self.j_card_attacking))
                     if flag_attack_player[0]: # player could be attacked ?
                         self.color[self.i_card_attacking][self.j_card_attacking].setAlpha(200)
                         self.refresh(flag_attack_player)
                         self.ongo_attack = False
                         self.qapp.restoreOverrideCursor()
+
+            # Game is ended ?
+            self.end = self.game.condition_endgame()
+            if self.end:
+                self.close()
         
         self.update()
