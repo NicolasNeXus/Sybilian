@@ -305,10 +305,10 @@ class GameGraphic(QWidget):
 
 
     def mouseReleaseEvent(self, e: QMouseEvent) -> None:
-        """ To attack a monster or a player """
+        """ To attack a monster or a player or draw a card from deck """
         position = e.pos()
         # Draw a card from the deck
-        if QRect(self.current_deck.x(), self.current_deck.y(), self.current_deck.width, self.current_deck.height).contains(e.pos()):
+        if not self.ongo_attack and QRect(self.current_deck.x(), self.current_deck.y(), self.current_deck.width, self.current_deck.height).contains(e.pos()):
             flag_draw = self.game.can_draw_card()
             if flag_draw[0]:
                 self.refresh(flag_draw)
