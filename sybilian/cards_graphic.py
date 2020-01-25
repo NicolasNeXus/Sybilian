@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QPushButton, QWidget, QApplication, QLabel
 from PyQt5.QtCore import Qt, QMimeData, QRect
-from PyQt5.QtGui import QPainter, QColor, QPixmap, QDrag, QPen, QCursor
+from PyQt5.QtGui import QPainter, QColor, QPixmap, QDrag, QPen, QCursor, QMouseEvent
 
 from cards import Card
 
@@ -29,7 +29,8 @@ class GraphicCard(QLabel):
         """ Return the description of the card """
         return self.card.__str__()
 
-    def mouseMoveEvent(self, e):
+    def mouseMoveEvent(self, e: QMouseEvent) -> None:
+        """ When the cursor moves, accept drag and drop """
         if e.buttons() != Qt.LeftButton:
             return
 
@@ -39,10 +40,12 @@ class GraphicCard(QLabel):
         drag.setHotSpot(e.pos() - self.rect().topLeft())
         dropAction = drag.exec_(Qt.MoveAction)
 
-    def enterEvent(self, e):
+    def enterEvent(self, e: QMouseEvent) -> None:
+        """ When the cursor hovers the area, display card parameters """
         self.explanation.move(680, 400)
         self.explanation.setText(self.card.name + "\n\n" + self.card.game_text)
         self.explanation.setVisible(True)
   
-    def leaveEvent(self, e):
+    def leaveEvent(self, e: QMouseEvent) -> None:
+        """ When the cursor quits the area, hide the card's text """
         self.explanation.hide()
