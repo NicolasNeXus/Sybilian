@@ -71,7 +71,10 @@ class Game_Graphic(QWidget):
             for j in range(len(board[0])):
                 self.grid[i][j] = Card_Graphic(board[i][j], self)
                 if not isinstance(self.grid[i][j].card, Placeholder):
-                    self.grid[i][j].setPixmap(QPixmap("monster.png"))
+                    if i < 2:
+                        self.grid[i][j].setPixmap(QPixmap("monster.png"))
+                    else:
+                        self.grid[i][j].setPixmap(QPixmap("monster_2.png"))
                     if self.grid[i][j].card.life == 1:
                         self.color[i][j] = QColor(105, 105, 105, 200)
                 else:
@@ -85,15 +88,17 @@ class Game_Graphic(QWidget):
         for j in range(len(hand)):
             card = Card_Graphic(hand[j], self)
             if player_name == self.players[self.tour%2]:
-                self.current_hand.append(card) 
-                card.setPixmap(QPixmap("monster.png"))
+                self.current_hand.append(card)
+                if self.tour%2 == 0:
+                    card.setPixmap(QPixmap("monster.png"))
+                else:
+                    card.setPixmap(QPixmap("monster_2.png"))
             else:
                 self.other_hand.append(card)
                 card.setPixmap(QPixmap("hidden_card.png"))
             card.move(130 + 70*j, 10 + 700*i)
             card.show()
-        print([self.current_hand[i].card for i in range(len(self.current_hand))])
-            
+
     def initDeck(self, player_name: str) -> None:
         i = self.players.index(player_name)
         if player_name == self.players[self.tour%2]:
@@ -150,26 +155,25 @@ class Game_Graphic(QWidget):
             print('flag_turn', flag_change_turn)
             if flag_change_turn[0]:
                 self.tour += 1
-                #self.len_current_deck, self.len_other_deck = self.len_other_deck, self.len_current_deck
                 self.refresh(flag_change_turn)
-                print('current', self.len_current_deck, 'opp', self.len_other_deck)
                 self.current_deck, self.other_deck = self.other_deck, self.current_deck
-#                self.deck_current.setText(str(self.len_current_deck))
-#                self.deck_current.setVisible(True)
-#                self.deck_other.setText(str(self.len_other_deck))
-#                self.deck_other.setVisible(True)
-                #self.len_current_deck, self.len_other_deck = self.len_other_deck, self.len_current_deck
-                #self.len_current_deck, self.len_other_deck = self.len_other_deck, self.len_current_deck
-                #self.len_current_deck, self.len_other_deck = self.len_other_deck, self.len_current_deck
+
+                # remained cards in decks
+                if self.tour%2 == 0:
+                    self.deck_current.setText(str(self.len_current_deck))
+                    self.deck_other.setText(str(self.len_other_deck))
+                else:
+                    self.deck_current.setText(str(self.len_other_deck))
+                    self.deck_other.setText(str(self.len_current_deck))
                 self.ongo_attack = False                
-                
+
                 # text to indicate the current tour
                 self.text_tour.setText("Tour : " + str(self.tour))
                 if self.tour%2 == 0:
                     self.text_tour.setStyleSheet("color: red;")
                 else:
                     self.text_tour.setStyleSheet("color: blue;")
-                
+
                 # Game is ended ?
                 self.end = self.game.condition_endgame()
                 if self.end:
@@ -195,8 +199,13 @@ class Game_Graphic(QWidget):
         
         self.initBoard(self.grid)
 
-        # Number of cards in the deck
-
+        # Number of cards in the decks
+        self.deck_current.move(760, 260)
+        self.deck_other.move(760, 590)
+        self.deck_current.setText(str(self.len_current_deck))
+        self.deck_other.setText(str(self.len_other_deck))
+        self.deck_current.setVisible(True)
+        self.deck_other.setVisible(True)
 
         # main window with its properties
         self.setWindowTitle('Sybilian')
@@ -288,13 +297,13 @@ class Game_Graphic(QWidget):
             flag_draw = self.game.can_draw_card()
             if flag_draw[0]:
                 self.refresh(flag_draw)
-                self.deck_current.move(760, 260)
-                self.deck_current.setText(str(self.len_current_deck))
-                self.deck_current.setVisible(True)
-                self.deck_other.move(760, 590)
-                self.deck_other.setText(str(self.len_other_deck))
-                self.deck_other.setVisible(True)
-        
+                if self.tour%2 == 0:
+                    self.deck_current.setText(str(self.len_current_deck))
+                    self.deck_other.setText(str(self.len_other_deck))
+                else:
+                    self.deck_current.setText(str(self.len_other_deck))
+                    self.deck_other.setText(str(self.len_current_deck))
+
         # attack mode
         if self.tour >= 1: # after the first tour, we can attack
             # click on the board ?
