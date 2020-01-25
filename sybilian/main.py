@@ -1,11 +1,11 @@
-from game_graphic import *
-from PyQt5.QtWidgets import QApplication
 import sys
+from PyQt5.QtWidgets import QApplication
 
-           
+from game_graphic import Game_Graphic
+
+
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    game_graph = Game_Graphic(app)
-    game_graph.show()
-    app.exec_()
-
+    APP = QApplication(sys.argv)
+    GAME_GRAPH = Game_Graphic(APP)
+    GAME_GRAPH.show()
+    APP.exec_()

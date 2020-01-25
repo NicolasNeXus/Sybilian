@@ -4,27 +4,29 @@
     our game.
 """
 
-from cards import *
-from deck import *
-from board import *
-from bdd import *
 import random
+from collections import deque
+from cards import Monster, Placeholder, Spell
+from deck import Life, Hand, Graveyard
+from board import Board
+from bdd import csv_to_deck
 
 
 class Player:
     """
         The Player is the main class of our game.
         It can access the board, play cards and
-        attack the other player with his cards.
+        attack the other player with his cards
     """
 
-    def __init__(self, deck_name: str, board: Board, lines: list) -> None:
+    def __init__(self, deck_name: str, board: Board, lines: list)-> None:
+        """ Construct a player
+
+        :param deck_name : name of the player's deck
+        :param board : board of the game
+        :lines : lines where the player can play cards
         """
-            Each player has a name, which is linked to
-            the name of the deck, and has 3 3 keys elements
-            which are a Life, a Hand and a Graveyard.
-            The player knows the other player as well.
-        """
+
         self.deck = self.create_deck(deck_name)
         self.owner = deck_name
         self.life = Life(self.deck)
@@ -36,12 +38,7 @@ class Player:
         self.other_player = None
 
     def draw(self) -> None:
-        """
-            Draw a card from the
-            deck and put it
-            into the hand of
-            the player
-        """
+        """ Draw a card from the deck/hp and put it in the player's hand """
         # The deck still have at least one card
         if self.deck.size >= 1:
             # Verify that the player have less than max_len cards in his hand
@@ -54,12 +51,7 @@ class Player:
             self.draw_hp()
 
     def draw_hp(self) -> None:
-        """
-            Draw a card from the
-            HP and put it
-            into the hand of
-            the player
-        """
+        """ Draw a card from the hp and put it in the player's hand """
         self.life_points -= 1
         # The life deck still have at least one card
         if self.life.size >= 1:
@@ -70,35 +62,31 @@ class Player:
             else:
                 self.grave.add(self.life.draw())
 
-
     def create_deck(self, deck_name: str):
+        """ Create the deck of the player
+
+        :param deck_name : name of the deck
         """
-            Create the deck of the player
-            according to the name of the
-            deck
-        """
+
         return csv_to_deck(deck_name)
 
     def attack_monster(self, card: Monster, other_card: Monster) -> None:
         """
-            Attack the other Monster
-            on the board directly. We put
-            the cards into the purgatory
-            and we clean the board aswell.
-            We then empty the purgatory to
-            activate the effects
+            Attack the other Monster, put cards in the purgatory,
+            clean the board and empty the purgatory which
+            activates the effects
+
+        :param card : monster which attacks
+        :param other_card : monster which is attacked
         """
+
         card.attack(other_card)
         self.board.clean()
         self.empty_purgatory()
         self.other_player.empty_purgatory()
 
     def verify_first_line_opponent_empty(self) -> bool:
-        """
-            Verify that the first line on the board
-            of the opponent is empty
-            Return True if it's empty
-        """
+        """ Return True if the first line of the opponent is empty """
         empty = not isinstance(
             self.board.grid[self.other_player.lines[0]][0], Monster)
         for i in range(1, 3):
@@ -107,25 +95,28 @@ class Player:
             )
         return empty
 
-    def attack_player_with_monster(self, card: Monster, other_player) -> None:
+    def attack_player_with_monster(self, card: Monster) -> None:
+        """ Attack the other player directly
+
+        :param card : monster which attacks
         """
-            Attack the other player
-            directly.
-        """
-        other_player.draw_hp()
+
+        self.other_player.draw_hp()
         card.life -= 1
         self.board.clean()
         self.empty_purgatory()
 
     def effect_impact(self, card: Monster, targets: list = [Placeholder()]) -> None:
+        """ Trigger impact effect of a card
+
+        :param card : monster which has an impact effect
+        :param targets : optional list of targets
         """
-            Trigger impact effect of a card
-            it takes an optionnal target
-        """
+
         if "Impact" in card.effect.keys():
             if card.effect["Impact"]["Condition"] == "None":
                 if "Damage" in card.effect["Impact"]["Event"]["Do"]:
-                    if "Target" == card.effect["Impact"]["Event"]["Do"]["Damage"] and all(list(map(lambda card: isinstance(card, Monster), targets))):
+                    if card.effect["Impact"]["Event"]["Do"]["Damage"] == "Target" and all(list(map(lambda card: isinstance(card, Monster), targets))):
                         if card.effect["Impact"]["Event"]["Target"]["Owner"] == "Both":
                             for i in range(min(card.effect["Impact"]["Event"]["Target"]["Amount"], len(targets))):
                                 card_targeted = targets[i]
@@ -134,12 +125,12 @@ class Player:
                                   # no need to return a card
 
     def effect_destruction(self, card: Monster, targets: list = [Placeholder()]) -> None:
+        """ Trigger the desctruction
+
+        :param card : monster which has a destruction effect
+        :param targets : optional list of targets
         """
-            Trigger the desctruction
-            effect or a card.
-            it takes an optionnal
-            target
-        """
+
         if "Destruction" in card.effect.keys():
             if card.effect["Destruction"]["Condition"] == "None":
                 if "Lose_HP" in card.effect["Destruction"]["Event"]["Do"].keys():
@@ -157,10 +148,11 @@ class Player:
                             self.other_player.draw_hp()
 
     def effect_spell(self, card: Spell) -> None:
+        """ Trigger the effect of a spell
+
+        :param card : spell
         """
-            Trigger the effect
-            of a spell
-        """
+
         if "Spell" in card.effect.keys():
             if card.effect["Spell_effect"]["Condition"] == "None":
                 print("No condition")
@@ -177,25 +169,18 @@ class Player:
 
     def empty_purgatory(self) -> None:
         """
-            Put the monsters within the
-            purgatory in the graveyard
-            if and only if they are
-            dead. It also triggers
-            the destruction effect
+            Transfer monsters in the purgatory to the graveyard
+            if they are dead and activate the destruction effect
         """
+
         storage = deque([])
         storage_size = 0
         for _ in range(self.board.purgatory.size):
             card_purgatory = self.board.purgatory.draw()
-#            print(card_purgatory.owner)
-#            print(self.owner)
             # One should apply here the effect on the card
             if card_purgatory.owner == self.owner:
                 self.effect_destruction(card_purgatory)
-                self.grave.add(
-                    card_purgatory
-                )  # après regarder si ya les effets de destruction...
-            # c'est les cartes de l'adversaire on les "réempile" dans le purgatoire
+                self.grave.add(card_purgatory)
             else:
                 storage_size += 1
                 storage.append(card_purgatory)
@@ -203,9 +188,7 @@ class Player:
             self.board.purgatory.add(storage.pop())
 
     def my_undamaged_monsters(self) -> list:
-        """
-            Return a list containing the undamaged monsters of the player
-        """
+        """ Return a list of the undamaged monsters of the player """
         monsters = []
         for line in self.lines:
             for col in [0, 1, 2]:
@@ -215,17 +198,18 @@ class Player:
         return monsters
 
     def play(self, j: int, coord: tuple = (0, 0)) -> None:
+        """ Play a card from the player's hand on the board
+
+        :param j : index of the card
+        :param coord : coordinates
         """
-            The player plays a card from
-            its hand on the board at the
-            position coord
-        """
+
         card_played = self.hand.play(j)
         if isinstance(card_played, Monster):
             if "Impact" in card_played.effect.keys():
                 target_list = self.other_player.my_undamaged_monsters()
                 random.shuffle(target_list)
-                if "Target" in card_played.effect["Impact"]["Event"].keys() :
+                if "Target" in card_played.effect["Impact"]["Event"].keys():
                     max_target = card_played.effect["Impact"]["Event"]["Target"]["Amount"]
                     self.effect_impact(card_played, target_list[:min(len(target_list), max_target)])
                 else:

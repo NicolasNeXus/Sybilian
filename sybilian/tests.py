@@ -6,11 +6,8 @@ Created on Fri Jan 17 15:47:08 2020
 """
 
 import unittest
-from cards import *
-from deck import *
-from board import *
-from player import *
-from game import *
+from cards import Monster, Placeholder
+from game import Game
 
 
 class TestCanPlayMonster(unittest.TestCase):
