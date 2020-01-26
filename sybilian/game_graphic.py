@@ -98,7 +98,7 @@ class GameGraphic(QWidget):
                 if self.tour%2 == 0:
                     card.setPixmap(QPixmap("monster.png"))
                 else:
-                    card.setPixmap(QPixmap("monster.png"))
+                    card.setPixmap(QPixmap("monster_2.png"))
             else:
                 self.other_hand.append(card)
                 card.setPixmap(QPixmap("hidden_card.png"))
