@@ -38,7 +38,7 @@ class Placeholder(Card):
         self.name = ""
         self.price = 0
         self.effect = {}
-        self.game_text = " . "
+        self.game_text = " "
 
 
 class Monster(Card):
