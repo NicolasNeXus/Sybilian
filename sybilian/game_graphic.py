@@ -75,7 +75,7 @@ class GameGraphic(QWidget):
                     if i < 2:
                         self.grid[i][j].setPixmap(QPixmap("monster.png"))
                     else:
-                        self.grid[i][j].setPixmap(QPixmap("monster.png"))
+                        self.grid[i][j].setPixmap(QPixmap("monster_2.png"))
                     if self.grid[i][j].card.life == 1:
                         self.color[i][j] = QColor(105, 105, 105, 200)
                 else:
