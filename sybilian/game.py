@@ -55,7 +55,7 @@ class Game:
         opponent = self.players[(self.index + 1) % 2]
         # The owner's card that wants to play is the player who is playing and
         # the card is a monster
-        if isinstance(player_playing.hand.read_card(index_card), Monster):
+        if index_card is not None and isinstance(player_playing.hand.read_card(index_card), Monster):
             # The player still have actions left
             if self.nb_actions > 0:
                 # The coordinates are valid
@@ -82,7 +82,7 @@ class Game:
         opponent = self.players[(self.index + 1) % 2]
         # The owner's card that wants to play is the player who is playing and
         # the card is a spell
-        if isinstance(player_playing.hand.read_card(index_card), Spell):
+        if index_card is not None and isinstance(player_playing.hand.read_card(index_card), Spell):
             player_playing.play(index_card)
             return [True, player_playing.hand.container, player_playing.deck.size, player_playing.life.size, player_playing.grave.size, opponent.hand.size, opponent.deck.size, opponent.life.size, opponent.grave.size, self.board]
         return [False]
