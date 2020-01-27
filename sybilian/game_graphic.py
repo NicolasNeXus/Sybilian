@@ -1,7 +1,7 @@
 # graphics use
 from PyQt5.QtWidgets import QPushButton, QWidget, QApplication, QLabel
 from PyQt5.QtCore import Qt, QMimeData, QRect
-from PyQt5.QtGui import QPainter, QColor, QPixmap, QDrag, QPen, QCursor, QFont
+from PyQt5.QtGui import QPainter, QColor, QPixmap, QDrag, QPen, QCursor, QFont, QMouseEvent
 
 from cards import Placeholder
 from cards_graphic import GraphicCard
@@ -130,7 +130,7 @@ class GameGraphic(QWidget):
         elif self.other_hand == hand:
             self.other_hand = []
 
-    def clearBoard(self):
+    def clearBoard(self) -> None:
         """ Erase the board """
         for i in range(len(self.grid)):
             for j in range(len(self.grid[0])):
@@ -162,7 +162,7 @@ class GameGraphic(QWidget):
     def initUi(self) -> None:
         """ Main window """
 
-        def change_turn():
+        def change_turn() -> None:
             """ End the turn of the current player if it's OK """
             flag_change_turn = self.game.can_end_turn()
             print('flag_turn', flag_change_turn)
@@ -248,7 +248,7 @@ class GameGraphic(QWidget):
             self.clearBoard()
             self.initBoard(list_area[9].grid)
 
-    def dragEnterEvent(self, e) -> None:
+    def dragEnterEvent(self, e: QMouseEvent) -> None:
         """ Beginning of a drag and drop to play a card """
         e.accept()
         for i in range(len(self.current_hand)):
@@ -259,10 +259,11 @@ class GameGraphic(QWidget):
                 print(i)
 
     def move_card_from_hand_to_board(self, index_current_card: int, position: tuple) -> None:
+        """ Move a card to a position """
         self.current_hand[self.index_current_card].move(self.position[position[0]][position[1]].x(), self.position[position[0]][position[1]].y())
         self.index_current_card = None
 
-    def dropEvent(self, e) -> None:
+    def dropEvent(self, e: QMouseEvent) -> None:
         """ End of a drag and drop to play a card """
         position = e.pos()
         flag_spell = self.game.can_play_spell(self.index_current_card)
@@ -283,7 +284,7 @@ class GameGraphic(QWidget):
         print(self.game.board)
         self.update()
 
-    def paintEvent(self, e):
+    def paintEvent(self, e: QMouseEvent) -> None:
         """ Color the areas where players put their cards """
         painter = QPainter(self)
         # Display the board
@@ -303,11 +304,11 @@ class GameGraphic(QWidget):
         painter.end()
 
 
-    def mouseReleaseEvent(self, e) -> None:
-        """ To attack a monster or a player """
+    def mouseReleaseEvent(self, e: QMouseEvent) -> None:
+        """ To attack a monster or a player or draw a card from deck """
         position = e.pos()
         # Draw a card from the deck
-        if QRect(self.current_deck.x(), self.current_deck.y(), self.current_deck.width, self.current_deck.height).contains(e.pos()):
+        if not self.ongo_attack and QRect(self.current_deck.x(), self.current_deck.y(), self.current_deck.width, self.current_deck.height).contains(e.pos()):
             flag_draw = self.game.can_draw_card()
             if flag_draw[0]:
                 self.refresh(flag_draw)
