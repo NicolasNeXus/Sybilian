@@ -75,7 +75,7 @@ class GameGraphic(QWidget):
                     if i < 2:
                         self.grid[i][j].setPixmap(QPixmap("monster.png"))
                     else:
-                        self.grid[i][j].setPixmap(QPixmap("monster.png"))
+                        self.grid[i][j].setPixmap(QPixmap("monster_2.png"))
                     if self.grid[i][j].card.life == 1:
                         self.color[i][j] = QColor(105, 105, 105, 200)
                 else:
@@ -98,7 +98,7 @@ class GameGraphic(QWidget):
                 if self.tour%2 == 0:
                     card.setPixmap(QPixmap("monster.png"))
                 else:
-                    card.setPixmap(QPixmap("monster.png"))
+                    card.setPixmap(QPixmap("monster_2.png"))
             else:
                 self.other_hand.append(card)
                 card.setPixmap(QPixmap("hidden_card.png"))
