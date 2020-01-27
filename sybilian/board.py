@@ -17,7 +17,7 @@ class Board:
                 printable_content += card.name + " | "
             printable_content += "\n"
             if i == 1:
-                printable_content += "------------------------\n"
+                printable_content += "--------------------------------------\n"
         return printable_content
 
     def get_monster(self, coord: tuple) -> Monster:

@@ -121,7 +121,7 @@ class Game:
             self.nb_actions -= 1
         return [False]
 
-    def card_can_attack(self, coord: tuple) -> bool:
+    def can_card_attack(self, coord: tuple) -> bool:
         """ Return True if the card with the coordinates coord can attack """
         player_playing = self.players[self.index]
         # The coordinates are valid

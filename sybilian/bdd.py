@@ -3,7 +3,7 @@ from pprint import pprint
 from json import loads
 from pymongo import MongoClient
 
-from cards import Monster
+from cards import Monster, Card
 from deck import Deck
 
 
@@ -17,15 +17,15 @@ def reset_bd() -> None:
     COLLECTION.delete_many({})
 
 
-def upload_tsv_bdd(csv_file: str) -> None:
+def upload_tsv_bdd(tsv_file: str) -> None:
     """ Connect to the BDD and append all the new cards
         !! we don't check if the card already exists
 
-    :param csv_file : name of the file
+    :param tsv_file : name of the file
     """
 
-    with open(csv_file, newline='') as csvfile:
-        parse = csv.reader(csvfile, delimiter="\t", quotechar="|")
+    with open(tsv_file, newline='') as tsvfile:
+        parse = tsv.reader(tsvfile, delimiter="\t", quotechar="|")
         card_list = []
         for j, row in enumerate(parse):
             try:
@@ -48,7 +48,7 @@ def upload_tsv_bdd(csv_file: str) -> None:
                 pass
 
 
-def pull_card(id_card: str) -> Monster:
+def pull_card(id_card: str) -> Card:
     """ Ask the BDD to pull the card with the specic id
 
     :param id_card : id of the card

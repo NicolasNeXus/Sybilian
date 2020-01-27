@@ -329,7 +329,7 @@ class GameGraphic(QWidget):
                             self.i_card_attacking = i
                             self.j_card_attacking = j
                             self.color[i][j].setAlpha(50)
-                            if self.game.card_can_attack((i, j)):
+                            if self.game.can_card_attack((i, j)):
                                 self.ongo_attack = True # ongoing attack
                                 self.qapp.setOverrideCursor(Qt.CrossCursor)
                         else: # Ongoing attack
