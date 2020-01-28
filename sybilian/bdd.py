@@ -25,7 +25,7 @@ def upload_tsv_bdd(tsv_file: str) -> None:
     """
 
     with open(tsv_file, newline='') as tsvfile:
-        parse = tsv.reader(tsvfile, delimiter="\t", quotechar="|")
+        parse = tsvfile.reader(tsvfile, delimiter="\t", quotechar="|")
         card_list = []
         for j, row in enumerate(parse):
             try:

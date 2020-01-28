@@ -52,7 +52,7 @@ class Monster(Card):
 
     def attack(self, card_2):
         """ Attack another monster """
-        assert(self.life > 0)
+        assert self.life > 0
         if "Powerful" in self.effect.keys() and self.effect["Powerful"] == "No_condition":
             if "Powerful" in card_2.effect.keys() and card_2.effect["Powerful"] == "No_condition":
                 card_2.life -= 1
@@ -60,7 +60,7 @@ class Monster(Card):
                 card_2.life = 0
             self.life -= 1
         else:
-            if "Powerful" in card_2.effect.keys() and card_2.effect["Powerful"] =="No_condition":
+            if "Powerful" in card_2.effect.keys() and card_2.effect["Powerful"] == "No_condition":
                 self.life = 0
             else:
                 self.life -= 1
